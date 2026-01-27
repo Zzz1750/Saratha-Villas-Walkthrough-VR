@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>VR Sky Radius Experiment</title>
+    <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <!-- Sky Sphere -->
+      <a-sphere id="skySphere"
+        src="./images/vr_images/1.png"
+        radius="20"
+        segments-height="64"
+        segments-width="64"
+        rotation="0 0 0"
+        scale="-1 1 1"> <!-- scale -1 flips sphere inward -->
+      </a-sphere>
+
+      <!-- Camera Rig with Cursor for controller interaction -->
+      <a-entity id="rig" position="0 1.6 0">
+        <a-camera>
+          <a-cursor 
+            raycaster="objects: .clickable" 
+            fuse="true" 
+            fuse-timeout="500"
+            material="color: yellow; shader: flat">
+          </a-cursor>
+        </a-camera>
+      </a-entity>
+
+      <!-- Increase Radius Button -->
+      <a-plane class="clickable"
+        id="increaseBtn"
+        position="-0.5 1 -3"
+        width="0.8" height="0.4"
+        color="green"
+        text="value: + Radius; align: center;">
+      </a-plane>
+
+      <!-- Decrease Radius Button -->
+      <a-plane class="clickable"
+        id="decreaseBtn"
+        position="0.5 1 -3"
+        width="0.8" height="0.4"
+        color="red"
+        text="value: - Radius; align: center;">
+      </a-plane>
+    </a-scene>
+
+    <script>
+      const skySphere = document.getElementById('skySphere');
+      const increaseBtn = document.getElementById('increaseBtn');
+      const decreaseBtn = document.getElementById('decreaseBtn');
+
+      let radius = 500;
+
+      increaseBtn.addEventListener('click', () => {
+        radius += 50;
+        skySphere.setAttribute('radius', radius);
+        console.log("Radius increased:", radius);
+      });
+
+      decreaseBtn.addEventListener('click', () => {
+        if (radius > 50) { // prevent collapsing to 0
+          radius -= 50;
+          skySphere.setAttribute('radius', radius);
+          console.log("Radius decreased:", radius);
+        }
+      });
+    </script>
+  </body>
+</html>

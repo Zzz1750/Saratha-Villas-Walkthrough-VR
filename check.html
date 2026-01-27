@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <title>Positioner</title>
+  <style>
+    body{
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <a-scene vr-mode-ui="enabled: false" xr-mode-ui="enabled: false" cursor="rayOrigin: mouse">
+  
+    <a-sky></a-sky>
+    
+    <!-- Camera -->
+    <a-entity id="camera-rig" position="0 1.6 0" rotation="0 -90 0">
+      <a-camera  look-controls></a-camera>
+    </a-entity>
+  
+    <!-- 1 Hotspot -->
+   <a-entity position="5 3 -3" rotation="0 -90 0" look-at="#camera-rig">
+      <a-circle color="black" radius="0.5" material="opacity: 0.7; transparent: true"></a-circle>
+      <a-plane 
+        src="./images/hotspot.webp" 
+        width="0.6" 
+        height="0.6" 
+        transparent="true" 
+        position="0 0 0.01"
+        material="opacity: 0.9; transparent: true">
+      </a-plane>
+   </a-entity>
+
+    <!-- 1 eye -->
+   <a-entity position="8 6 -10" rotation="0 -50 0" id="eye1">
+      <a-circle color="black" radius="0.3" material="opacity: 0.7; transparent: true"></a-circle>
+      <a-plane 
+        src="./images/eye.webp" 
+        width="0.3" 
+        height="0.3" 
+        transparent="true" 
+        position="0 0 0.01"
+        material="opacity: 0.9; transparent: true">
+      </a-plane>
+   </a-entity>
+
+   <!-- 2 eye -->
+   <a-entity position="10 6 7" rotation="0 -120 0" id="eye2">
+      <a-circle color="black" radius="0.3" material="opacity: 0.7; transparent: true"></a-circle>
+      <a-plane 
+        src="./images/eye.webp" 
+        width="0.3" 
+        height="0.3" 
+        transparent="true" 
+        position="0 0 0.01"
+        material="opacity: 0.9; transparent: true">
+      </a-plane>
+   </a-entity>
+
+    <!-- Top Arrow Model-2 Fast Forward -->
+    <a-entity position="6 0 0" rotation="-90 0 0" id="top_model2" visible="false">
+    <a-circle color="white" radius="0.9"  material="opacity: 0.6; transparent: true"></a-circle>
+    <a-plane 
+      src="./images/arrow_model2.png" 
+      width="1" 
+      height="1" 
+      transparent="true" 
+      position="0 0 0.01"
+      material="opacity: 0.8; transparent: true">
+    </a-plane>
+  </a-entity>
+
+ <!-- Bottom Arrow -->
+    <a-entity rotation="-90 180 0" position="-5 -2 -0.5" id="bottom_arrow" >
+      
+      <a-circle color="white" radius="0.9"  material="opacity: 0.6; transparent: true"></a-circle>
+      
+      <a-plane 
+        src="./images/arrow_model2.png" 
+        width="1" 
+        height="1" 
+        transparent="true" 
+        position="0 0 0.01"
+        material="opacity: 0.8; transparent: true">
+      </a-plane>
+    </a-entity>
+    
+  </a-scene>
+
+  <script>
+    var top_model2 = document.getElementById('top_model2');
+    const sky = document.querySelector('a-sky')
+
+    let left_location = right_location = top_location = bottom_location = '';
+    
+    let top_model2_value = 0;
+    
+    
+    top_model2.addEventListener('click',()=>{
+      console.log('hello')
+    })
+
+
+
+  const functions = {
+      scene1: function() {
+        sky.setAttribute('src','./images/vr_images/2.png');
+        top_model2_value = 1;
+        nav_icon_updater()
+      }
+  }
+
+  function nav_icon_updater(){
+      top_model2.setAttribute('visible',top_model2_value !== 0)
+  }
+
+
+  /*Default Scene*/
+  functions.scene1();
+  </script>
+</body>
+</html>
