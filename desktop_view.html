@@ -1245,6 +1245,7 @@
   document.getElementById('beginBtn').addEventListener('click', () => {
     splash.style.opacity = '0';
     setTimeout(() => splash.style.display = 'none', 600);
+    document.documentElement.requestFullscreen();
   });
 
   // ── Auto-Rotate ────────────────────────────────────────
