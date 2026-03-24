@@ -32,20 +32,44 @@
   .sv-body { padding:10px 12px 12px; }
   .sv-name { color:#fff;font-size:13px;font-weight:500;margin-bottom:3px; }
   .sv-sub { color:rgba(255,255,255,0.45);font-size:11px; }
+
+  .hud-element { transition: opacity 0.6s ease; }
+  .hud-hidden { opacity: 0 !important; pointer-events: none !important; }
+
+  #dotTrail span {
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; background: rgba(255,255,255,0.25);
+    transition: background 0.3s, transform 0.3s;
+  }
+  #dotTrail span.active {
+    background: rgba(255,255,255,0.9);
+    transform: scale(1.4);
+  }
+
+  #splash {
+    position: fixed; inset: 0; z-index: 5000;
+    background: rgba(0,0,0,0.92);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    transition: opacity 0.6s ease;
+  }
   </style>
 </head>
 <body>
-  <!-- Progress Bar -->
-  <div style="
-    position: fixed; top: 58px; left: 50%; transform: translateX(-50%);
-    z-index: 998; display: flex; align-items: center; gap: 8px;
-    pointer-events: none;
-  ">
+  <!-- Progress + Dot Trail + Timer -->
+<div class="hud-element" style="
+  position: fixed; top: 58px; left: 50%; transform: translateX(-50%);
+  z-index: 998; display: flex; flex-direction: column;
+  align-items: center; gap: 6px; pointer-events: none;
+">
+  <div style="display:flex;align-items:center;gap:8px;">
     <span id="progressText" style="color:rgba(255,255,255,0.4);font-size:11px;white-space:nowrap;">1 of 14</span>
     <div style="width:120px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;">
       <div id="progressFill" style="height:100%;background:rgba(255,255,255,0.6);border-radius:2px;transition:width 0.4s ease;width:7%;"></div>
     </div>
   </div>
+  <div id="dotTrail" style="display:flex;gap:5px;align-items:center;"></div>
+</div>
 
   <!-- Fade Overlay -->
   <div id="fadeOverlay" style="
@@ -55,23 +79,27 @@
     transition: opacity 0.25s ease;
   "></div>
 
-  <!-- Keyboard Shortcuts -->
-<div style="
+  
+<!-- Keyboard Shortcuts -->
+<div class="hud-element" style="
   position: fixed; bottom: 28px; left: 28px; z-index: 997;
   display: flex; flex-direction: column; gap: 5px;
   pointer-events: none;
 ">
   <div style="color:rgba(255,255,255,0.35);font-size:11px;display:flex;align-items:center;gap:8px;">
-    <span style="color:rgba(255,255,255,0.6);font-weight:500;">↑ ↓</span> Navigate scenes
+    <span style="color:rgba(255,255,255,0.6);font-weight:500;">↑ ↓</span> Navigate
   </div>
   <div style="color:rgba(255,255,255,0.35);font-size:11px;display:flex;align-items:center;gap:8px;">
-    <span style="color:rgba(255,255,255,0.6);font-weight:500;">M</span> Open map
+    <span style="color:rgba(255,255,255,0.6);font-weight:500;">M</span> Map
   </div>
   <div style="color:rgba(255,255,255,0.35);font-size:11px;display:flex;align-items:center;gap:8px;">
-    <span style="color:rgba(255,255,255,0.6);font-weight:500;">I</span> Scene info
+    <span style="color:rgba(255,255,255,0.6);font-weight:500;">I</span> Info
   </div>
   <div style="color:rgba(255,255,255,0.35);font-size:11px;display:flex;align-items:center;gap:8px;">
-    <span style="color:rgba(255,255,255,0.6);font-weight:500;">Esc</span> Leave tour
+    <span style="color:rgba(255,255,255,0.6);font-weight:500;">F</span> Fullscreen
+  </div>
+  <div style="color:rgba(255,255,255,0.35);font-size:11px;display:flex;align-items:center;gap:8px;">
+    <span style="color:rgba(255,255,255,0.6);font-weight:500;">Esc</span> Leave
   </div>
 </div>
 
@@ -86,38 +114,10 @@
     pointer-events: none; white-space: nowrap;
   ">Link copied to clipboard</div>
 
-  <!-- Fullscreen -->
-  <button id="fullscreenBtn" title="Fullscreen" style="
-    width: 38px; height: 38px; border-radius: 50%; border: none;
-    background: rgba(255,255,255,0.07); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s;
-  " onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
-    <svg id="fsIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
-      <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
-    </svg>
-  </button>
-
-  <!-- Share -->
-  <button id="shareBtn" title="Share this scene" style="
-    width: 38px; height: 38px; border-radius: 50%; border: none;
-    background: rgba(255,255,255,0.07); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s;
-  " onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-    </svg>
-  </button>
-
-  <!-- second divider before leave -->
-  <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.12); margin: 0 2px;"></div>
+  
 
   <!-- Room Label -->
-  <div id="roomLabel" style="
+  <div id="roomLabel" class="hud-element" style="
     position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
     z-index: 998; background: rgba(10,10,10,0.75);
     border: 1px solid rgba(255,255,255,0.12);
@@ -128,7 +128,7 @@
   "></div>
 
     <!-- Map Button -->
-  <button id="mapBtn" style="
+  <button id="mapBtn" class="hud-element" style="
       position: fixed; bottom: 28px; right: 28px; z-index: 999;
       width: 52px; height: 52px; border-radius: 50%;
       background: rgba(10,10,10,0.85);
@@ -145,7 +145,7 @@
     </button>
 
     <!-- Compass -->
-    <div id="compass" style="
+    <div id="compass" class="hud-element" style="
       position: fixed; top: 20px; right: 20px; z-index: 998;
       width: 52px; height: 52px;
     ">
@@ -187,7 +187,7 @@
   </div>
 
     <!-- Bottom Bar -->
-    <div style="
+    <div class="hud-element" style="
       position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
       z-index: 999; display: flex; align-items: center; gap: 8px;
       background: rgba(10,10,10,0.85); border: 1px solid rgba(255,255,255,0.12);
@@ -222,6 +222,50 @@
 
       <!-- Divider -->
       <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.12); margin: 0 2px;"></div>
+
+      <!-- Audio Toggle -->
+      <button id="audioBtn" class="hud-element" title="Toggle audio" style="
+        width: 38px; height: 38px; border-radius: 50%; border: none;
+        background: rgba(255,255,255,0.07); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: background 0.15s;
+      " onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+        <svg id="audioIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
+      </button>
+
+      <!-- Divider before leave -->
+      <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.12); margin: 0 2px;"></div>
+
+      <!-- Fullscreen -->
+  <button id="fullscreenBtn" title="Fullscreen" style="
+    width: 38px; height: 38px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.07); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  " onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+    <svg id="fsIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+      <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+    </svg>
+  </button>
+
+  <!-- Share -->
+  <button id="shareBtn" title="Share this scene" style="
+    width: 38px; height: 38px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.07); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  " onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+    </svg>
+  </button>
 
       <!-- Leave -->
       <button id="leaveBtn" title="Leave tour" style="
@@ -289,8 +333,66 @@
       </div>
     </div>
 
+    <!-- Welcome Splash -->
+    <div id="splash">
+      <div style="text-align:center; max-width:420px; padding: 0 24px;">
+        <p style="color:rgba(255,255,255,0.35);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;">Heritage Walk</p>
+        <h1 style="color:#fff;font-size:32px;font-weight:500;margin:0 0 10px;line-height:1.2;">Saratha Vilas</h1>
+        <p style="color:rgba(255,255,255,0.45);font-size:14px;line-height:1.7;margin:0 0 32px;">
+          Step inside a living piece of history. Walk through 14 curated spaces of this heritage estate and discover the stories within.
+        </p>
+        <button id="beginBtn" style="
+          padding: 13px 36px; background: #fff; color: #0a0a0a;
+          border: none; border-radius: 30px; font-size: 14px; font-weight: 500;
+          cursor: pointer; font-family: 'Inter', sans-serif;
+          transition: transform 0.15s, background 0.15s;
+        " onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+          Begin Tour
+        </button>
+
+        <div style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0;">Background audio ?</p>
+      <div style="display:flex; gap:10px;">
+        <button id="audioYes" style="
+          padding: 9px 22px; background: rgba(255,255,255,0.1); color: #fff;
+          border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; font-size: 13px;
+          cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s;
+        " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+          Enable audio
+        </button>
+        <button id="audioNo" style="
+          padding: 9px 22px; background: transparent; color: rgba(255,255,255,0.35);
+          border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; font-size: 13px;
+          cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s;
+        " onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+          No thanks
+        </button>
+      </div>
+    </div>
+
+<!-- Hidden audio element -->
+<audio id="bgAudio" src="./background.mp3" loop></audio>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <button id="backBtn" class="hud-element" title="Go back" style="
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+      z-index: 999; display: flex; align-items: center; gap: 6px;
+      background: rgba(10,10,10,0.75); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.5); font-size: 12px; padding: 6px 14px 6px 10px;
+      border-radius: 20px; cursor: pointer; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s, background 0.15s;
+    " onmouseover="this.style.background='rgba(30,30,30,0.95)'" onmouseout="this.style.background='rgba(10,10,10,0.75)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Previous
+    </button>
+
+
     <!-- Info Button -->
-    <button id="infoBtn" title="About this scene" style="
+    <button id="infoBtn" class="hud-element" title="About this scene" style="
       position: fixed; top: 20px; left: 20px; z-index: 998;
       width: 52px; height: 52px; border-radius: 50%; border: none;
       background: rgba(10,10,10,0.85);
@@ -1088,6 +1190,167 @@
       openInfo();
     }
   });
+</script>
+
+<script>
+  // ── Dot Trail ──────────────────────────────────────────
+  const dotTrail = document.getElementById('dotTrail');
+  for (let i = 0; i < 14; i++) {
+    const dot = document.createElement('span');
+    if (i === 0) dot.classList.add('active');
+    dotTrail.appendChild(dot);
+  }
+
+  function updateDots(sceneId) {
+    const idx = sceneOrder.indexOf(sceneId);
+    dotTrail.querySelectorAll('span').forEach((d, i) => {
+      d.classList.toggle('active', i === idx);
+    });
+  }
+
+  // Hook into handleDirectionClick to update dots + timer
+  const _origDots = window.handleDirectionClick;
+  window.handleDirectionClick = function(loc) {
+    if (loc) {
+      updateDots(loc);
+      updateBackBtn(loc);
+    }
+    _origDots(loc);
+  };
+
+  // ── History Back Button ────────────────────────────────
+  const sceneHistory = [];
+  const backBtn = document.getElementById('backBtn');
+
+  function updateBackBtn(loc) {
+    if (loc) sceneHistory.push(loc);
+    if (sceneHistory.length > 1) {
+      backBtn.style.opacity = '1';
+      backBtn.style.pointerEvents = 'auto';
+    } else {
+      backBtn.style.opacity = '0';
+      backBtn.style.pointerEvents = 'none';
+    }
+  }
+
+  backBtn.addEventListener('click', () => {
+    if (sceneHistory.length < 2) return;
+    sceneHistory.pop(); // remove current
+    const prev = sceneHistory.pop(); // get previous (pop so push in handleDirectionClick re-adds it)
+    window.handleDirectionClick(prev);
+  });
+
+  // ── Welcome Splash ─────────────────────────────────────
+  const splash = document.getElementById('splash');
+  document.getElementById('beginBtn').addEventListener('click', () => {
+    splash.style.opacity = '0';
+    setTimeout(() => splash.style.display = 'none', 600);
+  });
+
+  // ── Auto-Rotate ────────────────────────────────────────
+let idleTimeout = null;
+let autoRotating = false;
+let autoRotateRaf = null;
+
+function startAutoRotate() {
+  if (autoRotating) return;
+  autoRotating = true;
+  const camEl = document.querySelector('a-camera');
+  const comp = camEl && camEl.components['smooth-mouse-look'];
+  function rotate() {
+    if (!autoRotating) return;
+    if (comp) {
+      comp.yaw += 0.002;
+    }
+    autoRotateRaf = requestAnimationFrame(rotate);
+  }
+  rotate();
+}
+
+function stopAutoRotate() {
+  autoRotating = false;
+  cancelAnimationFrame(autoRotateRaf);
+}
+
+  function resetIdle() {
+    stopAutoRotate();
+    clearTimeout(idleTimeout);
+    showHUD();
+    idleTimeout = setTimeout(() => {
+      hideHUD();
+      startAutoRotate();
+    }, 5000);
+  }
+
+  ['mousemove','mousedown','keydown','touchstart','wheel'].forEach(ev => {
+    window.addEventListener(ev, resetIdle, { passive: true });
+  });
+
+  // ── Hide/Show HUD on Idle ──────────────────────────────
+  function hideHUD() {
+  document.querySelectorAll('.hud-element').forEach(el => {
+    if (el.id === 'roomLabel') return;
+    el.classList.add('hud-hidden');
+  });
+  }
+  function showHUD() {
+    document.querySelectorAll('.hud-element').forEach(el => el.classList.remove('hud-hidden'));
+  }
+    // Start idle timer after splash
+    resetIdle();
+
+
+  // ── Keyboard: F for fullscreen ─────────────────────────
+  // Add to existing keydown listener
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'f' || e.key === 'F') {
+      document.getElementById('fullscreenBtn').click();
+    }
+  });
+</script>
+
+<script>
+  const bgAudio = document.getElementById('bgAudio');
+  const audioBtn = document.getElementById('audioBtn');
+  const audioIcon = document.getElementById('audioIcon');
+
+  const soundOnIcon = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>`;
+  const soundOffIcon = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>`;
+
+  let audioEnabled = false;
+  bgAudio.volume = 0.4;
+
+  function setAudioState(enabled) {
+    audioEnabled = enabled;
+    if (enabled) {
+      bgAudio.play().catch(() => {});
+      audioIcon.innerHTML = soundOnIcon;
+      audioBtn.style.background = 'rgba(255,255,255,0.07)';
+    } else {
+      bgAudio.pause();
+      audioIcon.innerHTML = soundOffIcon;
+      audioBtn.style.background = 'rgba(255,255,255,0.04)';
+    }
+  }
+
+  // Splash audio preference buttons
+  document.getElementById('audioYes').addEventListener('click', () => {
+    setAudioState(true);
+    document.getElementById('beginBtn').click();
+  });
+
+  document.getElementById('audioNo').addEventListener('click', () => {
+    setAudioState(false);
+    document.getElementById('beginBtn').click();
+  });
+
+  // Bottom bar toggle
+  audioBtn.addEventListener('click', () => {
+    setAudioState(!audioEnabled);
+  });
+
+  // Init icon to muted state
+  audioIcon.innerHTML = soundOffIcon;
 </script>
 </body>
 </html>

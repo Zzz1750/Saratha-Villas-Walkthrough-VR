@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Saratha Vilas - Home</title>
+  <link rel="icon" type="image/png" href="./images/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="./images/favicon.svg" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -547,9 +549,11 @@
     }
 
     .dir-card {
-  aspect-ratio: 16/11;
-  min-height: 420px;
-}
+      position: relative;
+      aspect-ratio: 1/1;
+      overflow: visible;
+      cursor: none;
+    }
     .dir-card-bg {
       position: absolute;
       inset: 0;
@@ -577,12 +581,6 @@
       inset: 0;
       opacity: 0.15;
     }
-.dir-card-bg,
-.dir-card-pattern,
-.vr-grid {
-  z-index: 0;
-  pointer-events: none; 
-}
 
     .dir-card-content {
       position: absolute;
@@ -591,7 +589,6 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      z-index: 5;
     }
     .dir-card-tag {
       display: inline-flex;
@@ -611,7 +608,6 @@
       border-radius: 50%;
       background: var(--gold);
     }
-    .dir-card-body {}
     .dir-card-icon {
       width: 52px; height: 52px;
       margin-bottom: 20px;
@@ -636,7 +632,6 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      z-index: 3;
     }
     .dir-card-link {
       display: flex;
@@ -1058,7 +1053,7 @@
       </div>
 
       <!-- WALKTHROUGH -->
-      <div class="dir-card dir-card--walk reveal" style="transition-delay:0.15s">
+      <div class="dir-card dir-card--walk reveal" style="transition-delay:0.15s" onclick="window.location.href='desktop_view.html'">
         <div class="dir-card-bg"></div>
         <!-- Ornamental pattern -->
         <svg class="dir-card-pattern" viewBox="0 0 600 420" preserveAspectRatio="none">
@@ -1087,7 +1082,7 @@
             <p class="dir-card-desc">A curated visual journey through every wing — rendered in high fidelity. Pan, rotate, and pause in any room. Ideal for planning your visit or exploring remotely.</p>
           </div>
           <div class="dir-card-footer">
-            <a href="walkthrough/" class="dir-card-link" style="color:var(--gold-light)">
+            <a href="/desktop_view.html" class="dir-card-link" style="color:var(--gold-light)">
               Begin Tour
               <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1179,7 +1174,5 @@
       statsObserver.observe(statsSection);
     }
   </script>
-
-  
 </body>
 </html>
