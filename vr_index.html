@@ -132,7 +132,7 @@
 
 
      <!-- 1 Hotspot -->
-    <a-entity position="5 3 3" rotation="0 -90 0" id="hotspot1">
+    <a-entity position="" rotation="" id="hotspot1" visible="false">
       <a-circle color="black" radius="0.2" material="opacity: 0.7; transparent: true" class="controller-clickable"></a-circle>
       <a-plane 
         src="./images/hotspot.webp" 
@@ -227,7 +227,9 @@
         info_obj_material.setAttribute('value','- Handcrafted terracotta');
         info_obj_description.setAttribute('value','- An auspicious entrance figure \n symbolizing strength, protection, \n and prosperity.');
         info_obj_picture.setAttribute('src','./images/objects/scene2_1.JPG')
-
+        
+        hotspot1.setAttribute('position', '5 3 3');
+        hotspot1.setAttribute('rotation', '0 -90 0');
         hotspot1_value = 1;
         nav_icon_updater();
       },
@@ -254,6 +256,7 @@
         top_arrow_value = 1;
         bottom_arrow_value= 1;
         
+        hotspot1_value = 0;
         nav_icon_updater();
       },
 
@@ -278,6 +281,7 @@
         top_arrow_value = 1;
         bottom_arrow_value= 1;
         
+        hotspot1_value = 0;
         nav_icon_updater();
       },
 
@@ -294,6 +298,7 @@
         eye1_value = eye2_value = 0;
         top_arrow_value = 0;
         bottom_arrow_value= 1;
+        hotspot1_value = 0;
         nav_icon_updater();
       },
 
@@ -310,6 +315,8 @@
         eye1_value = eye2_value = 0;
         top_arrow_value = 0;
         bottom_arrow_value= 1;
+
+        hotspot1_value = 0;
 
         nav_icon_updater();
       },
@@ -335,6 +342,16 @@
         top_arrow_value = 1;
         bottom_arrow_value= 1;
         
+       info_obj_name.setAttribute('value','Antique Chandelier');
+      info_obj_othername.setAttribute('value','- Ornate Hanging Light Fixture');
+      info_obj_material.setAttribute('value','- Glass, metal, and crystal');
+      info_obj_description.setAttribute('value','- A decorative ceiling light \n used to illuminate and enhance \n the grandeur of the hall.');
+      info_obj_picture.setAttribute('src','./images/objects/SKP09355.JPG');
+
+
+        hotspot1.setAttribute('position', '0.5 5 -0.5');
+        hotspot1.setAttribute('rotation', '90 -90 0');
+        hotspot1_value = 1;
         nav_icon_updater();
       },
 
@@ -390,7 +407,7 @@
         eye1_value = 1;
         top_arrow_value = 1;
         bottom_arrow_value= 1;
-        
+    
         nav_icon_updater();
       },
 
@@ -527,7 +544,7 @@
     })
 
     /*Default Scene*/
-    functions.scene2();
+    functions.scene1();
   </script>
     <script>
     const startVrButton = document.getElementById('start_vr');

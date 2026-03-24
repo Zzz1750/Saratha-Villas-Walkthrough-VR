@@ -1,467 +1,1185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="./images/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="./images/favicon.svg" />
-  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-  <title>Saratha Vilas Heritage Walk</title>
-  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saratha Vilas - Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    body{
-      padding: 0;   
-      margin: 0;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9A96E;
+      --gold-light: #E8D5A3;
+      --gold-dark: #8B6914;
+      --cream: #FAF6EE;
+      --ivory: #F5EFE0;
+      --charcoal: #1A1714;
+      --brown: #3D2B1F;
+      --warm-gray: #8C7B6B;
+      --border: rgba(201,169,110,0.25);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--charcoal);
+      color: var(--cream);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed;
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s ease;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(201,169,110,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.18s ease, width 0.2s, height 0.2s, opacity 0.2s;
+      transform: translate(-50%, -50%);
+    }
+    body:has(a:hover) .cursor-ring,
+    body:has(button:hover) .cursor-ring {
+      width: 56px; height: 56px;
+      opacity: 0.7;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: 9997;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 60px;
+      background: linear-gradient(to bottom, rgba(26,23,20,0.95), transparent);
+      backdrop-filter: blur(0px);
+    }
+    .nav-logo {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(250,246,238,0.6);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      background: var(--gold);
+      border: none;
+      padding: 10px 24px;
+      cursor: none;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      top: 50px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
+      text-align: center;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 110%, rgba(201,169,110,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 20%, rgba(201,169,110,0.05) 0%, transparent 60%),
+        linear-gradient(160deg, #1A1714 0%, #221C16 50%, #1A1714 100%);
+    }
+
+    .hero-ornament {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 700px;
+      border: 1px solid rgba(201,169,110,0.06);
+      border-radius: 50%;
+      animation: breathe 8s ease-in-out infinite;
+    }
+    .hero-ornament::before {
+      content: '';
+      position: absolute;
+      inset: 40px;
+      border: 1px solid rgba(201,169,110,0.09);
+      border-radius: 50%;
+    }
+    .hero-ornament::after {
+      content: '';
+      position: absolute;
+      inset: 80px;
+      border: 1px solid rgba(201,169,110,0.12);
+      border-radius: 50%;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+      50% { transform: translate(-50%, -50%) scale(1.03); opacity: 1; }
+    }
+
+    .hero-content { position: relative; z-index: 2; padding-bottom: 100px; }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.3s;
+    }
+
+    .hero-title {
+      font-size: clamp(64px, 9vw, 120px);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      color: var(--cream);
+      margin-bottom: 8px;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.5s;
+    }
+    .hero-title em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--gold-light);
+    }
+    .hero-subtitle-word {
+      display: block;
+      font-size: clamp(64px, 9vw, 120px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(201,169,110,0.35);
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.7s;
+    }
+
+    .hero-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 36px auto;
+      width: 240px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.9s;
+    }
+    .hero-divider span {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-dark));
+    }
+    .hero-divider span:last-child {
+      background: linear-gradient(to left, transparent, var(--gold-dark));
+    }
+    .hero-divider-diamond {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      transform: rotate(45deg);
+    }
+
+    .hero-desc {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.9;
+      color: rgba(250,246,238,0.55);
+      max-width: 420px;
+      margin: 0 auto 48px;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1.1s;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1.3s;
+    }
+    .btn-primary {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      background: var(--gold);
+      border: none;
+      padding: 16px 40px;
+      cursor: none;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .btn-ghost {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: transparent;
+      border: 1px solid rgba(201,169,110,0.35);
+      padding: 16px 40px;
+      cursor: none;
+      text-decoration: none;
+      display: inline-block;
+      transition: border-color 0.3s, background 0.3s, transform 0.2s;
+    }
+    .btn-ghost:hover {
+      border-color: var(--gold);
+      background: rgba(201,169,110,0.07);
+      transform: translateY(-2px);
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1.6s;
+      z-index: 1;
+    }
+    .hero-scroll span {
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(250,246,238,0.35);
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold-dark), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0% { opacity: 0; transform: scaleY(0); transform-origin: top; }
+      50% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+      100% { opacity: 0; transform: scaleY(1); transform-origin: bottom; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── ABOUT ── */
+    .about {
+      position: relative;
+      padding: 140px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 100px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .about-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+    }
+    .about-heading {
+      font-size: clamp(36px, 4vw, 52px);
+      font-weight: 300;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--cream);
+      margin-bottom: 32px;
+    }
+    .about-heading strong {
+      font-weight: 700;
+      display: block;
+    }
+    .about-text {
+      font-size: 14px;
+      line-height: 1.95;
+      color: rgba(250,246,238,0.55);
+      margin-bottom: 20px;
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 48px;
+    }
+    .stat-item {
+      padding: 28px 24px;
+      background: rgba(26,23,20,0.8);
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(250,246,238,0.4);
+    }
+
+    .about-visual {
+      position: relative;
+    }
+    .about-img-frame {
+      position: relative;
+      aspect-ratio: 3/4;
+      background: linear-gradient(135deg, #2A2118 0%, #1E1810 100%);
+      overflow: hidden;
+    }
+    .about-img-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 70%, rgba(201,169,110,0.15), transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A96E' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .about-img-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Architectural SVG illustration */
+    .arch-illustration { width: 80%; opacity: 0.6; }
+
+    .about-img-frame::after {
+      content: 'Est. 1924';
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      background: rgba(26,23,20,0.8);
+    }
+    .about-corner {
+      position: absolute;
+      top: -16px; right: -16px;
+      width: 80px; height: 80px;
+      border-top: 2px solid var(--gold);
+      border-right: 2px solid var(--gold);
+    }
+    .about-corner-bl {
+      position: absolute;
+      bottom: -16px; left: -16px;
+      width: 80px; height: 80px;
+      border-bottom: 2px solid var(--gold-dark);
+      border-left: 2px solid var(--gold-dark);
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      padding: 80px 60px 140px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 64px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .section-heading {
+      font-size: clamp(28px, 3.5vw, 42px);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--cream);
+    }
+    .section-heading strong { font-weight: 700; }
+    .section-note {
+      font-size: 12px;
+      color: rgba(250,246,238,0.35);
+      letter-spacing: 0.05em;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .feature-card {
+      background: rgba(26,23,20,0.9);
+      padding: 48px 36px;
+      position: relative;
+      transition: background 0.4s;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card:hover { background: rgba(32,27,22,0.95); }
+    .feature-icon {
+      width: 44px; height: 44px;
+      margin-bottom: 28px;
+      color: var(--gold);
+    }
+    .feature-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+    }
+    .feature-text {
+      font-size: 13px;
+      line-height: 1.85;
+      color: rgba(250,246,238,0.45);
+    }
+    .feature-num {
+      position: absolute;
+      top: 28px;
+      right: 28px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: rgba(201,169,110,0.2);
+    }
+
+    /* ── DIRECTORY SECTION ── */
+    .directory {
+      padding: 0 60px 160px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .directory-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .directory-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .dir-card {
+  aspect-ratio: 16/11;
+  min-height: 420px;
+}
+    .dir-card-bg {
+      position: absolute;
+      inset: 0;
+      transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .dir-card:hover .dir-card-bg { transform: scale(1.04); }
+
+    /* VR Card */
+    .dir-card--vr .dir-card-bg {
+      background:
+        radial-gradient(ellipse at 70% 30%, rgba(100,180,255,0.12), transparent 60%),
+        radial-gradient(ellipse at 20% 80%, rgba(201,169,110,0.1), transparent 50%),
+        linear-gradient(135deg, #0D1520 0%, #111822 50%, #0A1018 100%);
+    }
+    /* Walkthrough Card */
+    .dir-card--walk .dir-card-bg {
+      background:
+        radial-gradient(ellipse at 30% 30%, rgba(201,169,110,0.15), transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(180,100,60,0.1), transparent 50%),
+        linear-gradient(135deg, #1A1208 0%, #201808 50%, #160F05 100%);
+    }
+
+    .dir-card-pattern {
+      position: absolute;
+      inset: 0;
+      opacity: 0.15;
+    }
+.dir-card-bg,
+.dir-card-pattern,
+.vr-grid {
+  z-index: 0;
+  pointer-events: none; 
+}
+
+    .dir-card-content {
+      position: absolute;
+      inset: 0;
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 5;
+    }
+    .dir-card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(250,246,238,0.5);
+      border: 1px solid rgba(250,246,238,0.15);
+      padding: 7px 16px;
+      width: fit-content;
+    }
+    .dir-card-tag-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+    .dir-card-body {}
+    .dir-card-icon {
+      width: 52px; height: 52px;
+      margin-bottom: 20px;
+      transition: transform 0.4s ease;
+    }
+    .dir-card:hover .dir-card-icon { transform: scale(1.1) rotate(-3deg); }
+    .dir-card-title {
+      font-size: clamp(32px, 3.5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--cream);
+      line-height: 1.05;
+      margin-bottom: 14px;
+    }
+    .dir-card-desc {
+      font-size: 13px;
+      line-height: 1.8;
+      color: rgba(250,246,238,0.5);
+      max-width: 320px;
+    }
+    .dir-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 3;
+    }
+    .dir-card-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      transition: gap 0.3s;
+    }
+    .dir-card:hover .dir-card-link { gap: 20px; }
+    .dir-card-link svg {
+      width: 20px; height: 20px;
+      transition: transform 0.3s;
+    }
+    .dir-card:hover .dir-card-link svg { transform: translateX(4px); }
+    .dir-card-number {
+      font-size: 72px;
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      color: rgba(250,246,238,0.04);
+      line-height: 1;
+      user-select: none;
+    }
+    .dir-card-border {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(201,169,110,0);
+      transition: border-color 0.4s;
+      pointer-events: none;
+    }
+    .dir-card:hover .dir-card-border { border-color: rgba(201,169,110,0.25); }
+
+    /* VR Grid lines */
+    .vr-grid {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .dir-card--vr:hover .vr-grid { opacity: 1; }
+
+    /* ── TESTIMONIAL / QUOTE ── */
+    .quote-section {
+      padding: 100px 60px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      background: rgba(201,169,110,0.02);
+    }
+    .quote-mark {
+      font-size: 80px;
+      line-height: 0.5;
+      color: var(--gold-dark);
+      font-family: Georgia, serif;
+      margin-bottom: 32px;
+      display: block;
+    }
+    .quote-text {
+      font-size: clamp(20px, 2.5vw, 28px);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--cream);
+      max-width: 760px;
+      margin: 0 auto 32px;
+      letter-spacing: -0.01em;
+    }
+    .quote-attr {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+    }
+    .footer-logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .footer-tagline {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: rgba(250,246,238,0.3);
+      margin-top: 6px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .footer-links a {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(250,246,238,0.35);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-copy {
+      font-size: 11px;
+      color: rgba(250,246,238,0.2);
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 18px 24px; }
+      .nav-links { display: none; }
+      .nav-cta { padding: 9px 18px; font-size: 10px; }
+      body { cursor: auto; }
+      .cursor, .cursor-ring { display: none; }
+    }
+    @media (max-width: 700px) {
+      .hero-ornament { width: 340px; height: 340px; }
+      .hero-content { padding-bottom: 80px; }
+      .hero-eyebrow { font-size: 9px; letter-spacing: 0.22em; margin-bottom: 20px; }
+      .hero-divider { margin: 24px auto; }
+      .hero-desc { font-size: 13px; padding: 0 16px; margin-bottom: 36px; }
+      .hero-actions { flex-direction: column; align-items: center; gap: 12px; padding: 0 24px; }
+      .btn-primary, .btn-ghost { width: 100%; max-width: 280px; text-align: center; padding: 14px 24px; }
+      .hero-scroll { bottom: 24px; }
+
+      .about { grid-template-columns: 1fr; padding: 72px 24px; gap: 48px; }
+      .about-visual { order: -1; }
+      .about-img-frame { aspect-ratio: 4/3; }
+      .about-corner, .about-corner-bl { display: none; }
+      .about-stats { grid-template-columns: repeat(3, 1fr); }
+      .stat-item { padding: 20px 12px; }
+      .stat-number { font-size: 28px; }
+      .stat-label { font-size: 9px; letter-spacing: 0.1em; }
+
+      .features { padding: 40px 24px 72px; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .section-note { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .feature-card { padding: 36px 28px; }
+
+      .directory { padding: 0 20px 80px; }
+      .directory-grid { grid-template-columns: 1fr; gap: 16px; }
+      .dir-card { aspect-ratio: 4/3; }
+      .dir-card-content { padding: 32px 28px; }
+      .dir-card-title { font-size: 36px; }
+      .dir-card-desc { font-size: 12px; }
+
+      .quote-section { padding: 60px 24px; }
+      .quote-text { font-size: 18px; }
+
+      footer { flex-direction: column; gap: 28px; padding: 40px 24px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; gap: 20px; }
     }
   </style>
 </head>
 <body>
 
-  <div id="main_container">
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
 
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Chettinad Heritage</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#experience">Experience</a></li>
+
+    </ul>
+    <a href="#directory" class="nav-cta">Explore</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-ornament"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Heritage Estate · South India · Est. 1924</p>
+      <h1 class="hero-title"><em>Saratha</em></h1>
+      <span class="hero-subtitle-word">Vilas</span>
+      <div class="hero-divider">
+        <span></span>
+        <div class="hero-divider-diamond"></div>
+        <span></span>
+      </div>
+      <p class="hero-desc">A century-old palatial estate where colonial grandeur meets the soul of South India — now brought to life through immersive digital experiences.</p>
+      <div class="hero-actions">
+        <a href="#directory" class="btn-primary">Explore Now</a>
+        <a href="#about" class="btn-ghost">Discover More</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about">
+    <div class="reveal">
+      <p class="about-label">Our Heritage</p>
+      <h2 class="about-heading">A Legacy <strong>Written in Stone</strong></h2>
+      <p class="about-text">Built in 1924 by the merchant prince Krishnaswami Saratha, this palatial estate stands as one of the finest examples of Indo-Saracenic architecture in the region. Its high vaulted corridors, hand-painted frescoes, and teak-wood antechambers whisper stories of a time when grandeur was a way of life.</p>
+      <p class="about-text">Spanning over 18,000 sq ft across four wings, Saratha Vilas has hosted royalty, diplomats, and artists. Today, it is preserved as a living museum — every room a chapter, every corridor a verse.</p>
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-number">100<span style="font-size:20px;color:var(--gold-dark)">+</span></div>
+          <div class="stat-label">Years of Heritage</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">24</div>
+          <div class="stat-label">Heritage Rooms</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4</div>
+          <div class="stat-label">Distinct Wings</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-visual reveal" style="transition-delay:0.2s">
+      <div class="about-img-frame">
+        <div class="about-img-inner">
+          <!-- SVG Architectural Illustration -->
+          <svg class="arch-illustration" viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Base -->
+            <rect x="20" y="440" width="360" height="8" fill="#C9A96E" opacity="0.5"/>
+            <!-- Steps -->
+            <rect x="60" y="430" width="280" height="12" fill="#C9A96E" opacity="0.3"/>
+            <rect x="80" y="420" width="240" height="12" fill="#C9A96E" opacity="0.2"/>
+            <!-- Main building body -->
+            <rect x="100" y="200" width="200" height="220" fill="none" stroke="#C9A96E" stroke-width="1" opacity="0.4"/>
+            <!-- Side wings -->
+            <rect x="40" y="260" width="62" height="160" fill="none" stroke="#C9A96E" stroke-width="0.8" opacity="0.3"/>
+            <rect x="298" y="260" width="62" height="160" fill="none" stroke="#C9A96E" stroke-width="0.8" opacity="0.3"/>
+            <!-- Center dome -->
+            <path d="M160 200 Q200 130 240 200" fill="none" stroke="#C9A96E" stroke-width="1.5" opacity="0.7"/>
+            <ellipse cx="200" cy="200" rx="40" ry="8" fill="none" stroke="#C9A96E" stroke-width="0.8" opacity="0.4"/>
+            <line x1="200" y1="130" x2="200" y2="150" stroke="#C9A96E" stroke-width="1" opacity="0.6"/>
+            <!-- Finial -->
+            <polygon points="200,120 204,136 196,136" fill="#C9A96E" opacity="0.5"/>
+            <!-- Arched windows center -->
+            <path d="M175 310 Q175 290 190 290 L210 290 Q225 290 225 310 L225 350 L175 350 Z" fill="none" stroke="#C9A96E" stroke-width="0.8" opacity="0.5"/>
+            <!-- Door arch -->
+            <path d="M182 418 Q182 390 200 390 Q218 390 218 418 L218 420 L182 420 Z" fill="none" stroke="#C9A96E" stroke-width="1" opacity="0.6"/>
+            <!-- Window arches x4 -->
+            <path d="M115 260 Q115 245 125 245 L145 245 Q155 245 155 260 L155 290 L115 290 Z" fill="none" stroke="#C9A96E" stroke-width="0.7" opacity="0.4"/>
+            <path d="M245 260 Q245 245 255 245 L275 245 Q285 245 285 260 L285 290 L245 290 Z" fill="none" stroke="#C9A96E" stroke-width="0.7" opacity="0.4"/>
+            <!-- Side wing windows -->
+            <rect x="55" y="290" width="32" height="40" rx="16" fill="none" stroke="#C9A96E" stroke-width="0.7" opacity="0.35"/>
+            <rect x="313" y="290" width="32" height="40" rx="16" fill="none" stroke="#C9A96E" stroke-width="0.7" opacity="0.35"/>
+            <!-- Balustrade top -->
+            <line x1="100" y1="200" x2="300" y2="200" stroke="#C9A96E" stroke-width="0.8" opacity="0.4"/>
+            <!-- Columns -->
+            <line x1="130" y1="200" x2="130" y2="420" stroke="#C9A96E" stroke-width="0.6" opacity="0.2"/>
+            <line x1="160" y1="200" x2="160" y2="420" stroke="#C9A96E" stroke-width="0.6" opacity="0.2"/>
+            <line x1="240" y1="200" x2="240" y2="420" stroke="#C9A96E" stroke-width="0.6" opacity="0.2"/>
+            <line x1="270" y1="200" x2="270" y2="420" stroke="#C9A96E" stroke-width="0.6" opacity="0.2"/>
+            <!-- Ornamental top border -->
+            <path d="M100 200 L110 190 L120 200 L130 190 L140 200 L150 190 L160 200 L170 190 L180 200 L190 190 L200 200 L210 190 L220 200 L230 190 L240 200 L250 190 L260 200 L270 190 L280 200 L290 190 L300 200" fill="none" stroke="#C9A96E" stroke-width="0.8" opacity="0.5"/>
+            <!-- Glow effect -->
+            <ellipse cx="200" cy="380" rx="80" ry="20" fill="#C9A96E" opacity="0.03"/>
+          </svg>
+        </div>
+      </div>
+      <div class="about-corner"></div>
+      <div class="about-corner-bl"></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="experience" class="features">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">What Awaits You</p>
+        <h2 class="section-heading">The Vilas <strong>Experience</strong></h2>
+      </div>
+      <span class="section-note">Curated for the discerning visitor</span>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <span class="feature-num">01</span>
+        <svg class="feature-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 36V16L22 8L36 16V36H28V26H16V36H8Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+          <circle cx="22" cy="20" r="3" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <h3 class="feature-title">Architecture & Design</h3>
+        <p class="feature-text">Explore the estate's Indo-Saracenic façade, its Moorish arches, intricate jali screens, and ornate stucco work — a vocabulary of design that blurs East and West.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.1s">
+        <span class="feature-num">02</span>
+        <svg class="feature-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="12" width="32" height="22" rx="2" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M14 34V38M30 34V38M10 38H34" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M18 23L21 26L26 19" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3 class="feature-title">Curated Collections</h3>
+        <p class="feature-text">Over 600 artefacts — bronze Nataraja sculptures, colonial-era silverware, hand-knotted Kochi carpets, and correspondence from the Dewan's court — are preserved within these walls.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.2s">
+        <span class="feature-num">03</span>
+        <svg class="feature-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 8C22 8 10 16 10 26C10 32.6274 15.3726 38 22 38C28.6274 38 34 32.6274 34 26C34 16 22 8 22 8Z" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M16 27C16 27 18 31 22 31C26 31 28 27 28 27" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <h3 class="feature-title">Garden & Grounds</h3>
+        <p class="feature-text">Four acres of manicured gardens surround the vilas — century-old rain trees, a rose terrace, a lily pond, and a secluded pavilion once used for evening recitals.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.3s">
+        <span class="feature-num">04</span>
+        <svg class="feature-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="22" r="14" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M22 8V10M22 34V36M8 22H10M34 22H36" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="22" cy="22" r="4" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <h3 class="feature-title">Living History</h3>
+        <p class="feature-text">Seasonal events, classical music evenings, and storytelling walks bring the heritage alive. Saratha Vilas is not a relic — it is a living, breathing chapter of South India's cultural story.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.4s">
+        <span class="feature-num">05</span>
+        <svg class="feature-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 32L8 36M32 32L36 36" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          <rect x="10" y="14" width="24" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M18 23C18 21.3431 19.3431 20 21 20H23C24.6569 20 26 21.3431 26 23V32H18V23Z" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <h3 class="feature-title">Heritage Stays</h3>
+        <p class="feature-text">Select suites within the estate have been thoughtfully restored to offer overnight stays. Fall asleep beneath hand-painted ceilings, wake to the fragrance of jasmine in the courtyard.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.5s">
+        <span class="feature-num">06</span>
+        <svg class="feature-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 34L16 22L22 28L28 18L34 34H10Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+          <circle cx="30" cy="14" r="4" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <h3 class="feature-title">Digital Archive</h3>
+        <p class="feature-text">Decades of photographs, letters, and blueprints have been digitised into an accessible public archive — a gift to historians, researchers, and the simply curious.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <div class="quote-section reveal">
+    <span class="quote-mark">"</span>
+    <p class="quote-text">Saratha Vilas is not merely a house. It is the autobiography of a family, the memoir of a region, and the testament of an era that chose beauty as its highest virtue.</p>
+    <p class="quote-attr">— The Hindu, Heritage Supplement, 2019</p>
   </div>
 
-  <a-scene vr-mode-ui="enabled: false" xr-mode-ui="enabled: false" cursor="rayOrigin: mouse">
-  
-    <a-sky></a-sky>
-    
-    <!-- Camera -->
-    <a-entity id="camera-rig" position="0 1.6 0" rotation="0 -90 0">
-      <a-camera fov="90" look-controls wasd-controls-enabled="false"></a-camera>
-    </a-entity>
+  <!-- DIRECTORY -->
+  <section id="directory" class="directory" style="padding-top:120px;">
+    <div class="directory-header reveal">
+      <p class="section-label">Explore the Estate</p>
+      <h2 class="section-heading" style="font-size:clamp(32px,4vw,52px);">Choose Your <strong>Journey</strong></h2>
+      <p style="font-size:14px;color:rgba(250,246,238,0.4);margin-top:16px;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.8;">Two ways to experience Saratha Vilas — each crafted to bring you closer to its soul.</p>
+    </div>
 
-    <!-- Top Arrow -->
-    <a-entity rotation="-90 0 0" id="top_arrow" visible="false">
-      <a-circle color="white" radius="0.9" material="opacity: 0.8; transparent: true"></a-circle>
-      <a-plane 
-        src="./images/arrow_model2.png" 
-        width="1" 
-        height="1" 
-        transparent="true" 
-        position="0 0 0.01"
-        material="shader: flat; opacity: 0.8; transparent: true">
-      </a-plane>
-    </a-entity>
+    <div class="directory-grid">
 
-    <!-- Bottom Arrow -->
-    <a-entity rotation="-90 180 0"  id="bottom_arrow" visible="false">
-      <a-circle color="white" radius="0.9" material="opacity: 0.8; transparent: true"></a-circle>
-      <a-plane 
-        src="./images/arrow_model2.png" 
-        width="1" 
-        height="1" 
-        transparent="true" 
-        position="0 0 0.01"
-        material="shader: flat; opacity: 0.8; transparent: true">
-      </a-plane>
-    </a-entity>
+      <!-- VR PLAY -->
+      <div class="dir-card dir-card--vr reveal">
+        <div class="dir-card-bg"></div>
+        <!-- VR Grid lines SVG -->
+        <svg class="dir-card-pattern vr-grid" viewBox="0 0 600 420" preserveAspectRatio="none">
+          <defs>
+            <pattern id="vrgrid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M60 0L0 0L0 60" fill="none" stroke="rgba(100,180,255,0.15)" stroke-width="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="600" height="420" fill="url(#vrgrid)"/>
+          <path d="M300 0 L300 420 M0 210 L600 210" stroke="rgba(100,180,255,0.08)" stroke-width="1"/>
+        </svg>
+        <div class="dir-card-border"></div>
+        <div class="dir-card-content">
+          <div class="dir-card-tag">
+            <div class="dir-card-tag-dot"></div>
+            Immersive Experience
+          </div>
+          <div class="dir-card-body">
+            <svg class="dir-card-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="16" width="44" height="24" rx="12" stroke="#C9A96E" stroke-width="1.5"/>
+              <circle cx="17" cy="28" r="5" stroke="#6AB4FF" stroke-width="1.2"/>
+              <circle cx="35" cy="28" r="5" stroke="#6AB4FF" stroke-width="1.2"/>
+              <line x1="22" y1="28" x2="30" y2="28" stroke="#C9A96E" stroke-width="1" stroke-dasharray="2 2"/>
+              <path d="M4 28 C4 28 8 24 4 20" stroke="#C9A96E" stroke-width="1" opacity="0.5"/>
+              <path d="M48 28 C48 28 44 24 48 20" stroke="#C9A96E" stroke-width="1" opacity="0.5"/>
+            </svg>
+            <h3 class="dir-card-title">VR<br/>Play</h3>
+            <p class="dir-card-desc">Step inside Saratha Vilas with a VR headset and move through its rooms as if you were there — the creak of teak floors, the play of afternoon light through jali screens.</p>
+          </div>
+          <div class="dir-card-footer">
+            <a href="vr-play/" class="dir-card-link">
+              Enter VR
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <span class="dir-card-number">01</span>
+          </div>
+        </div>
+      </div>
 
-    <!-- Exit Arrow -->
-    <a-entity rotation="0 -90 90"  id="exit_arrow" visible="false">
-      <a-circle color="white" radius="0.9" material="opacity: 0.8; transparent: true"></a-circle>
-      <a-plane 
-        src="./images/close.png" 
-        width="0.8" 
-        height="0.8" 
-        transparent="true" 
-        position="0 0 0.01"
-        material="shader: flat; opacity: 0.8; transparent: true">
-      </a-plane>
-      <a-text value="Exit" color="black" width="4" rotation="0 0 -90" position="0 0.15 2"></a-text>
-    </a-entity>
+      <!-- WALKTHROUGH -->
+      <div class="dir-card dir-card--walk reveal" style="transition-delay:0.15s">
+        <div class="dir-card-bg"></div>
+        <!-- Ornamental pattern -->
+        <svg class="dir-card-pattern" viewBox="0 0 600 420" preserveAspectRatio="none">
+          <defs>
+            <pattern id="ornpat" width="80" height="80" patternUnits="userSpaceOnUse">
+              <path d="M40 10 Q50 20 40 30 Q30 20 40 10Z" fill="none" stroke="rgba(201,169,110,0.12)" stroke-width="1"/>
+              <circle cx="40" cy="40" r="20" fill="none" stroke="rgba(201,169,110,0.07)" stroke-width="0.5"/>
+              <path d="M20 40 Q30 30 40 40 Q50 30 60 40 Q50 50 40 40 Q30 50 20 40Z" fill="none" stroke="rgba(201,169,110,0.08)" stroke-width="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="600" height="420" fill="url(#ornpat)"/>
+        </svg>
+        <div class="dir-card-border"></div>
+        <div class="dir-card-content">
+          <div class="dir-card-tag">
+            <div class="dir-card-tag-dot" style="background:#E8D5A3"></div>
+            Guided Tour
+          </div>
+          <div class="dir-card-body">
+            <svg class="dir-card-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="26" cy="26" r="20" stroke="#C9A96E" stroke-width="1.5"/>
+              <circle cx="26" cy="26" r="12" stroke="#C9A96E" stroke-width="0.8" opacity="0.4"/>
+              <path d="M26 14 L28 22 L36 22 L29.5 27 L32 35 L26 30 L20 35 L22.5 27 L16 22 L24 22 Z" stroke="#C9A96E" stroke-width="1" fill="rgba(201,169,110,0.15)" stroke-linejoin="round"/>
+            </svg>
+            <h3 class="dir-card-title">Walk<br/>through</h3>
+            <p class="dir-card-desc">A curated visual journey through every wing — rendered in high fidelity. Pan, rotate, and pause in any room. Ideal for planning your visit or exploring remotely.</p>
+          </div>
+          <div class="dir-card-footer">
+            <a href="walkthrough/" class="dir-card-link" style="color:var(--gold-light)">
+              Begin Tour
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <span class="dir-card-number">02</span>
+          </div>
+        </div>
+      </div>
 
-    <!-- 1 eye -->
-    <a-entity id="eye1" visible="false">
-      <a-circle color="black" radius="0.3" material="opacity: 0.7; transparent: true"></a-circle>
-      <a-plane 
-        src="./images/eye.webp" 
-        width="0.3" 
-        height="0.3" 
-        transparent="true" 
-        position="0 0 0.01"
-        material="shader: flat; opacity: 0.9; transparent: true">
-      </a-plane>
-    </a-entity>
+    </div>
+  </section>
 
-    <!-- 2 eye -->
-    <a-entity id="eye2" visible="false">
-      <a-circle color="black" radius="0.3" material="opacity: 0.7; transparent: true"></a-circle>
-      <a-plane 
-        src="./images/eye.webp" 
-        width="0.3" 
-        height="0.3" 
-        transparent="true" 
-        position="0 0 0.01"
-        material="shader: flat; opacity: 1; transparent: true">
-      </a-plane>
-    </a-entity>
-
-
-
-
-     <!-- 1 Hotspot -->
-    <!-- <a-entity position="5 3 3" rotation="0 -90 0" id="hotspot1">
-      <a-circle color="black" radius="0.2" material="opacity: 0.7; transparent: true"></a-circle>
-      <a-plane 
-        src="./images/hotspot.webp" 
-        width="0.2" 
-        height="0.2" 
-        transparent="true" 
-        position="0 0 0.01"
-        material="shader: flat; opacity: 0.9; transparent: true">
-      </a-plane>
-    </a-entity> -->
-
-     <!-- 2 Hotspot -->
-    <!-- <a-entity position="5 3 0" rotation="0 -90 0" id="hotspot2">
-      <a-circle color="black" radius="0.5" material="opacity: 0.7; transparent: true"></a-circle>
-      <a-plane 
-        src="./images/hotspot.webp" 
-        width="0.6" 
-        height="0.6" 
-        transparent="true" 
-        position="0 0 0.01"
-        material="shader: flat; opacity: 0.9; transparent: true">
-      </a-plane>
-    </a-entity> -->
-  </a-scene>
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <div class="footer-logo">Saratha Vilas</div>
+      <div class="footer-tagline">Heritage Estate · Est. 1924</div>
+    </div>
+    <ul class="footer-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="vr-play/">VR Play</a></li>
+      <li><a href="walkthrough/">Walkthrough</a></li>
+      
+    </ul>
+    <div class="footer-copy">© 2026 Chettinad Heritage. All rights reserved.</div>
+  </footer>
 
   <script>
-    const sky = document.querySelector('a-sky')
-    const eye1 = document.getElementById('eye1')
-    const eye2 = document.getElementById('eye2')
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    (function animCursor() {
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.14;
+      ry += (my - ry) * 0.14;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animCursor);
+    })();
 
-    var top_arrow = document.getElementById('top_arrow');
-    var bottom_arrow = document.getElementById('bottom_arrow');
-    var exit_arrow = document.getElementById('exit_arrow');
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => observer.observe(el));
 
-    let left_location = right_location = top_location = bottom_location = '';
-    let eye1_location = eye2_location = 0;
-    
-    let eye1_value = eye2_value = 0;
-    let top_arrow_value = bottom_arrow_value = 0;
-    
-    top_arrow.addEventListener('click', () => handleDirectionClick(top_location));
-    bottom_arrow.addEventListener('click', () => handleDirectionClick(bottom_location));
-    
-    eye1.addEventListener('click', () => handleDirectionClick(eye1_location));
-    eye2.addEventListener('click', () => handleDirectionClick(eye2_location));
-
-
-    const functions = {
-      scene1: function() {
-        sky.setAttribute('src','./images/vr_images/1.png');
-        top_arrow.setAttribute('position','5 0 0.5')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 1;
-        bottom_arrow_value = 0;
-        top_location='scene2';
-        bottom_location='';
-
-        nav_icon_updater();
-      },
-      scene2: function(){
-        sky.setAttribute('src','./images/vr_images/2.png');
-        
-        top_arrow.setAttribute('position','6 0 -2')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-7 -1 0')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-
-        eye1.setAttribute('position','8 6 -10')
-        eye2.setAttribute('position','10 6 7')
-        eye1.setAttribute('rotation','0 -50 0')
-        eye2.setAttribute('rotation','0 -120 0')
-        
-        
-        top_location ='scene3'
-        bottom_location='scene1'
-
-        eye1_location='scene4';
-        eye2_location='scene5';
-        eye1_value = eye2_value = 1;
-        top_arrow_value = 1;
-        bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene3: function(){
-        sky.setAttribute('src','./images/vr_images/3.png');
-        top_arrow.setAttribute('position','6 0 0')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-5 -2 -0.5')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1.setAttribute('position','5 5 -9')
-        eye2.setAttribute('position','5 5 9')
-        eye1.setAttribute('rotation','0 -50 0')
-        eye2.setAttribute('rotation','0 -150 0')
-
-        bottom_location='scene2'
-        top_location ='scene6'
-
-        eye1_location='scene4';
-        eye2_location='scene5';
-        eye1_value = eye2_value = 1;
-        top_arrow_value = 1;
-        bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene4: function(){
-        sky.setAttribute('src','./images/vr_images/4.png');
-
-        bottom_arrow.setAttribute('position','-5 1 -2')
-        bottom_arrow.setAttribute('rotation','0 70 -90')
-
-        bottom_location = 'scene3'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        nav_icon_updater();
-      },
-
-      scene5: function(){
-        sky.setAttribute('src','./images/vr_images/5.jpg');
-
-        bottom_arrow.setAttribute('position','4 1 0')
-        bottom_arrow.setAttribute('rotation','0 -90 -90')
-
-        bottom_location = 'scene3'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-
-        nav_icon_updater();
-      },
-
-     scene6: function(){
-        sky.setAttribute('src','./images/vr_images/6.png');
-        top_arrow.setAttribute('position','6 0 -1')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-6 0 -1')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1.setAttribute('position','0 3.5 -7')
-        eye2.setAttribute('position','0 3.5 7')
-        eye1.setAttribute('rotation','0 0 0')
-        eye2.setAttribute('rotation','0 -180 0')
-
-        bottom_location='scene3'
-        top_location ='scene9'
-
-        eye1_location='scene7';
-        eye2_location='scene8';
-        eye1_value = eye2_value = 1;
-        top_arrow_value = 1;
-        bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene7: function(){
-        sky.setAttribute('src','./images/vr_images/7.jpg');
-
-        bottom_arrow.setAttribute('position','-7 2 0.2')
-        bottom_arrow.setAttribute('rotation','0 90 90')
-
-        bottom_location = 'scene6'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        nav_icon_updater();
-      },
-
-      scene8: function(){
-        sky.setAttribute('src','./images/vr_images/real_8.png');
-
-        bottom_arrow.setAttribute('position','-4 2 8')
-        bottom_arrow.setAttribute('rotation','0 150 90')
-
-        bottom_location = 'scene6'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        nav_icon_updater();
-      },
-      
-      scene9: function(){
-        sky.setAttribute('src','./images/vr_images/8.png');
-
-        top_arrow.setAttribute('position','8 2 -0.5')
-        top_arrow.setAttribute('rotation','0 -90 90')
-        bottom_arrow.setAttribute('position','-7 0 -0.5')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1.setAttribute('position','-4 3.5 -5')
-        eye1.setAttribute('rotation','0 45 0')
-
-        bottom_location='scene6'
-        top_location ='scene11'
-
-        eye1_location='scene10';
-        eye2_location='';
-        eye2_value = 0;
-        eye1_value = 1;
-        top_arrow_value = 1;
-        bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene10: function(){
-        sky.setAttribute('src','./images/vr_images/9.jpg');
-
-        bottom_arrow.setAttribute('position','8 1 2')
-        bottom_arrow.setAttribute('rotation','0 -90 -90')
-
-        bottom_location = 'scene9'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        nav_icon_updater();
-      },
-
-      scene11: function(){
-        sky.setAttribute('src','./images/vr_images/13.png');
-
-        top_arrow.setAttribute('position','4 1 -0.5')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-7 2 0.7')
-        bottom_arrow.setAttribute('rotation','0 90 90')
-
-        bottom_location='scene9'
-        top_location ='scene12'
-
-        eye1_location='';
-        eye2_location='';
-    
-        eye1_value = eye2_value= 0;
- 
-        top_arrow_value = bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene12: function(){
-        sky.setAttribute('src','./images/vr_images/10.png');
-
-        top_arrow.setAttribute('position','5 1 -0.5')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-5 1 -0.5')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1.setAttribute('position','-1 3.5 -5')
-        eye1.setAttribute('rotation','0 0 0')
-
-        bottom_location='scene11'
-        top_location ='scene14'
-
-        eye1_location='scene13';
-        eye2_location='';
-        
-        eye1_value = 1;
-        eye2_value= 0;
- 
-        top_arrow_value = bottom_arrow_value= 1;
-        exit_arrow.setAttribute('position','6 100 0')
-        exit_arrow.setAttribute('visible','false')
-        
-        nav_icon_updater();
-      },
-
-      scene13: function(){
-        sky.setAttribute('src','./images/vr_images/11.jpg');
-
-        top_arrow.setAttribute('position','8 3 -0.5')
-        top_arrow.setAttribute('rotation','0 -90 90')
-        
-
-        bottom_location=''
-        top_location ='scene12'
-
-        eye1_location='';
-        eye2_location='';
-        
-        eye1_value = eye2_value= 0;
- 
-        top_arrow_value = 1;
-        bottom_arrow_value= 0;
-        
-        nav_icon_updater();
-      },
-
-      scene14: function(){
-        sky.setAttribute('src','./images/vr_images/12.png');
-
-        bottom_arrow.setAttribute('position','-8 3 1')
-        bottom_arrow.setAttribute('rotation','0 90 90')
-        
-        eye1.setAttribute('position','-1 3.5 -5')
-        eye1.setAttribute('rotation','0 0 0')
-
-        bottom_location='scene12'
-        top_location =''
-
-        eye1_location='';
-        eye2_location='';
-        
-        eye1_value = 0;
-        eye2_value= 0;
- 
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        
-        exit_arrow.setAttribute('position','6 2 0')
-        exit_arrow.setAttribute('visible','true')
-        nav_icon_updater();
-      }
-
-
+    // Stat counter animation
+    function animateCounters() {
+      document.querySelectorAll('.stat-number').forEach(el => {
+        const text = el.textContent;
+        const num = parseInt(text);
+        if (isNaN(num)) return;
+        const suffix = text.replace(/[0-9]/g, '').trim();
+        let start = 0;
+        const duration = 1400;
+        const startTime = performance.now();
+        function update(now) {
+          const progress = Math.min((now - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.firstChild.textContent = Math.round(eased * num);
+          if (progress < 1) requestAnimationFrame(update);
+        }
+        // Keep span child for suffix
+        const span = el.querySelector('span');
+        if (span) {
+          el.innerHTML = '';
+          el.appendChild(document.createTextNode('0'));
+          el.appendChild(span);
+        } else {
+          el.textContent = '0' + suffix;
+        }
+        requestAnimationFrame(update);
+      });
     }
 
-    function nav_icon_updater(){
-      top_arrow.setAttribute('visible',top_arrow_value !== 0)
-      bottom_arrow.setAttribute('visible',bottom_arrow_value !== 0)
-      eye1.setAttribute('visible',eye1_value !== 0)
-      eye2.setAttribute('visible',eye2_value !== 0)
+    const statsSection = document.querySelector('.about-stats');
+    if (statsSection) {
+      const statsObserver = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) { animateCounters(); statsObserver.disconnect(); }
+      }, { threshold: 0.5 });
+      statsObserver.observe(statsSection);
     }
-
-    function handleDirectionClick(location) {
-      if (location && functions[location]) {
-        functions[location]();
-      }
-    }
-
-    exit_arrow.addEventListener('click',()=>{
-      console.log('exit')
-    })
-
-    /*Default Scene*/
-    functions.scene1();
   </script>
+
+  
 </body>
 </html>
