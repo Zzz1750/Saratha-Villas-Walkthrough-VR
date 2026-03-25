@@ -166,7 +166,7 @@
       
       <!-- Audio choice section (hidden until loading completes) -->
       <div id="audioChoiceSection" class="audio-prompt">
-        <p>🎧 Enhance your journey with ambient audio?</p>
+        <p> Background audio?</p>
         <div class="audio-buttons">
           <button id="audioYesBtn" class="audio-btn audio-btn-yes">Yes, enable audio</button>
           <button id="audioNoBtn" class="audio-btn audio-btn-no">No, continue without</button>
@@ -627,7 +627,7 @@
       loadingPercent.textContent = percent + '%';
       if (loadedCount === totalImages) {
         loadingStatus.textContent = 'Ready!';
-        document.getElementById('entryLoaderText').textContent = 'CHOOSE AUDIO';
+        document.getElementById('entryLoaderText').textContent = 'READY!';
         // Show audio choice with fade-in
         audioChoiceDiv.classList.add('visible');
       } else {
