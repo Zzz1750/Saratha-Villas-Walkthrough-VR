@@ -46,16 +46,135 @@
     transform: scale(1.4);
   }
 
-  #splash {
-    position: fixed; inset: 0; z-index: 5000;
-    background: rgba(0,0,0,0.92);
+  /* LOADING + AUDIO SCREEN (Unified) */
+  #entryScreen {
+    position: fixed; inset: 0; z-index: 6000;
+    background: #0a0a0a;
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 12px;
+    align-items: center; justify-content: center;
     transition: opacity 0.6s ease;
+  }
+  .entry-container {
+    text-align: center;
+    max-width: 380px;
+    padding: 0 24px;
+  }
+  .loader-text {
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .progress-bar-container {
+    width: 260px;
+    height: 3px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 20px auto;
+  }
+  .progress-fill-load {
+    width: 0%;
+    height: 100%;
+    background: #fff;
+    border-radius: 4px;
+    transition: width 0.2s ease-out;
+  }
+  .loading-percent {
+    color: rgba(255,255,255,0.45);
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 12px;
+  }
+  .loading-status {
+    color: rgba(255,255,255,0.3);
+    font-size: 11px;
+    margin-top: 20px;
+  }
+  .heritage-load {
+    font-size: 28px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .heritage-sub {
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    margin-bottom: 32px;
+  }
+  .audio-prompt {
+    margin-top: 32px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .audio-prompt.visible {
+    opacity: 1;
+  }
+  .audio-prompt p {
+    color: rgba(255,255,255,0.45);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .audio-buttons {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+  }
+  .audio-btn {
+    padding: 10px 28px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .audio-btn-yes {
+    background: #fff;
+    color: #0a0a0a;
+  }
+  .audio-btn-yes:hover {
+    transform: scale(1.02);
+    background: #f0f0f0;
+  }
+  .audio-btn-no {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .audio-btn-no:hover {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
   }
   </style>
 </head>
 <body>
+  <!-- Unified Entry Screen: Loading + Audio Choice -->
+  <div id="entryScreen">
+    <div class="entry-container">
+      <div class="heritage-load">Saratha Vilas</div>
+      <div class="heritage-sub">Heritage Estate</div>
+      <div class="loader-text" id="entryLoaderText">LOADING VR EXPERIENCE</div>
+      <div class="progress-bar-container">
+        <div class="progress-fill-load" id="loadProgressFill"></div>
+      </div>
+      <div class="loading-percent" id="loadingPercent">0%</div>
+      <div class="loading-status" id="loadingStatus">Preloading 14 high-res images...</div>
+      
+      <!-- Audio choice section (hidden until loading completes) -->
+      <div id="audioChoiceSection" class="audio-prompt">
+        <p>🎧 Enhance your journey with ambient audio?</p>
+        <div class="audio-buttons">
+          <button id="audioYesBtn" class="audio-btn audio-btn-yes">Yes, enable audio</button>
+          <button id="audioNoBtn" class="audio-btn audio-btn-no">No, continue without</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Progress + Dot Trail + Timer -->
 <div class="hud-element" style="
   position: fixed; top: 58px; left: 50%; transform: translateX(-50%);
@@ -294,7 +413,6 @@
         border-radius: 16px; padding: 28px 28px 24px; width: 300px;
         display: flex; flex-direction: column; gap: 12px;
       ">
-        <!-- Icon -->
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
           <div style="
             width:36px; height:36px; border-radius:50%;
@@ -333,47 +451,8 @@
       </div>
     </div>
 
-    <!-- Welcome Splash -->
-    <div id="splash">
-      <div style="text-align:center; max-width:420px; padding: 0 24px;">
-        <p style="color:rgba(255,255,255,0.35);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;">Heritage Walk</p>
-        <h1 style="color:#fff;font-size:32px;font-weight:500;margin:0 0 10px;line-height:1.2;">Saratha Vilas</h1>
-        <p style="color:rgba(255,255,255,0.45);font-size:14px;line-height:1.7;margin:0 0 32px;">
-          Step inside a living piece of history. Walk through 14 curated spaces of this heritage estate and discover the stories within.
-        </p>
-        <button id="beginBtn" style="
-          padding: 13px 36px; background: #fff; color: #0a0a0a;
-          border: none; border-radius: 30px; font-size: 14px; font-weight: 500;
-          cursor: pointer; font-family: 'Inter', sans-serif;
-          transition: transform 0.15s, background 0.15s;
-        " onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-          Begin Tour
-        </button>
-
-        <div style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-      <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0;">Background audio ?</p>
-      <div style="display:flex; gap:10px;">
-        <button id="audioYes" style="
-          padding: 9px 22px; background: rgba(255,255,255,0.1); color: #fff;
-          border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; font-size: 13px;
-          cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s;
-        " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-          Enable audio
-        </button>
-        <button id="audioNo" style="
-          padding: 9px 22px; background: transparent; color: rgba(255,255,255,0.35);
-          border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; font-size: 13px;
-          cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s;
-        " onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
-          No thanks
-        </button>
-      </div>
-    </div>
-
-<!-- Hidden audio element -->
-<audio id="bgAudio" src="./background.mp3" loop></audio>
-      </div>
-    </div>
+    <!-- Hidden audio element -->
+    <audio id="bgAudio" src="./background.mp3" loop></audio>
 
     <!-- Back Button -->
     <button id="backBtn" class="hud-element" title="Go back" style="
@@ -513,38 +592,129 @@
         material="shader: flat; opacity: 1; transparent: true">
       </a-plane>
     </a-entity>
-
-
-
-
-     <!-- 1 Hotspot -->
-    <!-- <a-entity position="5 3 3" rotation="0 -90 0" id="hotspot1">
-      <a-circle color="black" radius="0.2" material="opacity: 0.7; transparent: true"></a-circle>
-      <a-plane 
-        src="./images/hotspot.webp" 
-        width="0.2" 
-        height="0.2" 
-        transparent="true" 
-        position="0 0 0.01"
-        material="shader: flat; opacity: 0.9; transparent: true">
-      </a-plane>
-    </a-entity> -->
-
-     <!-- 2 Hotspot -->
-    <!-- <a-entity position="5 3 0" rotation="0 -90 0" id="hotspot2">
-      <a-circle color="black" radius="0.5" material="opacity: 0.7; transparent: true"></a-circle>
-      <a-plane 
-        src="./images/hotspot.webp" 
-        width="0.6" 
-        height="0.6" 
-        transparent="true" 
-        position="0 0 0.01"
-        material="shader: flat; opacity: 0.9; transparent: true">
-      </a-plane>
-    </a-entity> -->
   </a-scene>
 
   <script>
+    // ---- PRELOAD ALL 14 VR IMAGES ----
+    const vrImagesList = [
+      './images/vr_images/1.png',
+      './images/vr_images/2.png',
+      './images/vr_images/3.png',
+      './images/vr_images/4.png',
+      './images/vr_images/5.jpg',
+      './images/vr_images/6.png',
+      './images/vr_images/7.jpg',
+      './images/vr_images/real_8.png',
+      './images/vr_images/8.png',
+      './images/vr_images/9.jpg',
+      './images/vr_images/13.png',
+      './images/vr_images/10.png',
+      './images/vr_images/11.jpg',
+      './images/vr_images/12.png'
+    ];
+    
+    let loadedCount = 0;
+    const totalImages = vrImagesList.length;
+    const loadProgressFill = document.getElementById('loadProgressFill');
+    const loadingPercent = document.getElementById('loadingPercent');
+    const loadingStatus = document.getElementById('loadingStatus');
+    const entryScreen = document.getElementById('entryScreen');
+    const audioChoiceDiv = document.getElementById('audioChoiceSection');
+    
+    function updateLoadingProgress() {
+      const percent = Math.round((loadedCount / totalImages) * 100);
+      loadProgressFill.style.width = percent + '%';
+      loadingPercent.textContent = percent + '%';
+      if (loadedCount === totalImages) {
+        loadingStatus.textContent = 'Ready!';
+        document.getElementById('entryLoaderText').textContent = 'CHOOSE AUDIO';
+        // Show audio choice with fade-in
+        audioChoiceDiv.classList.add('visible');
+      } else {
+        loadingStatus.textContent = `Loading ${loadedCount} of ${totalImages} VR images...`;
+      }
+    }
+    
+    function preloadImage(src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          loadedCount++;
+          updateLoadingProgress();
+          resolve();
+        };
+        img.onerror = () => {
+          console.warn(`Failed to load: ${src}, continuing`);
+          loadedCount++;
+          updateLoadingProgress();
+          resolve();
+        };
+        img.src = src;
+      });
+    }
+    
+    async function preloadAllImages() {
+      const promises = vrImagesList.map(url => preloadImage(url));
+      await Promise.all(promises);
+    }
+    
+    // Start preloading
+    preloadAllImages();
+    
+    // ---- AUDIO LOGIC ----
+    const bgAudio = document.getElementById('bgAudio');
+    const audioBtn = document.getElementById('audioBtn');
+    const audioIcon = document.getElementById('audioIcon');
+    const soundOnIcon = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>`;
+    const soundOffIcon = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>`;
+    let audioEnabled = false;
+    bgAudio.volume = 0.4;
+    
+    function setAudioState(enabled) {
+      audioEnabled = enabled;
+      if (enabled) {
+        bgAudio.play().catch(() => {});
+        audioIcon.innerHTML = soundOnIcon;
+        audioBtn.style.background = 'rgba(255,255,255,0.07)';
+      } else {
+        bgAudio.pause();
+        audioIcon.innerHTML = soundOffIcon;
+        audioBtn.style.background = 'rgba(255,255,255,0.04)';
+      }
+    }
+    
+    // Function to dismiss entry screen and start tour (after audio choice)
+    function startTour() {
+      entryScreen.style.opacity = '0';
+      setTimeout(() => {
+        entryScreen.style.display = 'none';
+        // Request fullscreen for immersion
+        document.documentElement.requestFullscreen().catch(() => {});
+        // Trigger idle timer and other initializations
+        resetIdle();
+      }, 600);
+    }
+    
+    // Audio choice handlers (no Begin Tour button)
+    document.getElementById('audioYesBtn').addEventListener('click', () => {
+      setAudioState(true);
+      startTour();
+    });
+    
+    document.getElementById('audioNoBtn').addEventListener('click', () => {
+      setAudioState(false);
+      startTour();
+    });
+    
+    // Bottom bar audio toggle (works after tour starts)
+    audioBtn.addEventListener('click', () => {
+      setAudioState(!audioEnabled);
+    });
+    
+    // Init icon to muted state
+    audioIcon.innerHTML = soundOffIcon;
+    
+    // ---- ALL ORIGINAL SCRIPT BELOW (unchanged except splash removal) ----
     const sky = document.querySelector('a-sky')
     const eye1 = document.getElementById('eye1')
     const eye2 = document.getElementById('eye2')
@@ -561,797 +731,92 @@
     
     top_arrow.addEventListener('click', () => handleDirectionClick(top_location));
     bottom_arrow.addEventListener('click', () => handleDirectionClick(bottom_location));
-    
     eye1.addEventListener('click', () => handleDirectionClick(eye1_location));
     eye2.addEventListener('click', () => handleDirectionClick(eye2_location));
 
-
     const functions = {
-      scene1: function() {
-        sky.setAttribute('src','./images/vr_images/1.png');
-        top_arrow.setAttribute('position','5 0 0.5')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 1;
-        bottom_arrow_value = 0;
-        top_location='scene2';
-        bottom_location='';
-
-        nav_icon_updater();
-      },
-      scene2: function(){
-        sky.setAttribute('src','./images/vr_images/2.png');
-        
-        top_arrow.setAttribute('position','6 0 -2')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-7 -1 0')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-
-        eye1.setAttribute('position','8 6 -10')
-        eye2.setAttribute('position','10 6 7')
-        eye1.setAttribute('rotation','0 -50 0')
-        eye2.setAttribute('rotation','0 -120 0')
-        
-        
-        top_location ='scene3'
-        bottom_location='scene1'
-
-        eye1_location='scene4';
-        eye2_location='scene5';
-        eye1_value = eye2_value = 1;
-        top_arrow_value = 1;
-        bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene3: function(){
-        sky.setAttribute('src','./images/vr_images/3.png');
-        top_arrow.setAttribute('position','6 0 0')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-5 -2 -0.5')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1.setAttribute('position','5 5 -9')
-        eye2.setAttribute('position','5 5 9')
-        eye1.setAttribute('rotation','0 -50 0')
-        eye2.setAttribute('rotation','0 -150 0')
-
-        bottom_location='scene2'
-        top_location ='scene6'
-
-        eye1_location='scene4';
-        eye2_location='scene5';
-        eye1_value = eye2_value = 1;
-        top_arrow_value = 1;
-        bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene4: function(){
-        sky.setAttribute('src','./images/vr_images/4.png');
-
-        bottom_arrow.setAttribute('position','-5 1 -2')
-        bottom_arrow.setAttribute('rotation','0 70 -90')
-
-        bottom_location = 'scene3'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        nav_icon_updater();
-      },
-
-      scene5: function(){
-        sky.setAttribute('src','./images/vr_images/5.jpg');
-
-        bottom_arrow.setAttribute('position','4 1 0')
-        bottom_arrow.setAttribute('rotation','0 -90 -90')
-
-        bottom_location = 'scene3'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-
-        nav_icon_updater();
-      },
-
-     scene6: function(){
-        sky.setAttribute('src','./images/vr_images/6.png');
-        top_arrow.setAttribute('position','6 0 -1')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-6 0 -1')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1.setAttribute('position','0 3.5 -7')
-        eye2.setAttribute('position','0 3.5 7')
-        eye1.setAttribute('rotation','0 0 0')
-        eye2.setAttribute('rotation','0 -180 0')
-
-        bottom_location='scene3'
-        top_location ='scene9'
-
-        eye1_location='scene7';
-        eye2_location='scene8';
-        eye1_value = eye2_value = 1;
-        top_arrow_value = 1;
-        bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene7: function(){
-        sky.setAttribute('src','./images/vr_images/7.jpg');
-
-        bottom_arrow.setAttribute('position','-4 2 -0.3')
-        bottom_arrow.setAttribute('rotation','0 90 90')
-
-        bottom_location = 'scene6'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        nav_icon_updater();
-      },
-
-      scene8: function(){
-        sky.setAttribute('src','./images/vr_images/real_8.png');
-
-        bottom_arrow.setAttribute('position','-4 2 8')
-        bottom_arrow.setAttribute('rotation','0 150 90')
-
-        bottom_location = 'scene6'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        nav_icon_updater();
-      },
-      
-      scene9: function(){
-        sky.setAttribute('src','./images/vr_images/8.png');
-
-        top_arrow.setAttribute('position','8 2 -0.5')
-        top_arrow.setAttribute('rotation','0 -90 90')
-        bottom_arrow.setAttribute('position','-7 0 -0.5')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1.setAttribute('position','-4 3.5 -5')
-        eye1.setAttribute('rotation','0 45 0')
-
-        bottom_location='scene6'
-        top_location ='scene11'
-
-        eye1_location='scene10';
-        eye2_location='';
-        eye2_value = 0;
-        eye1_value = 1;
-        top_arrow_value = 1;
-        bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene10: function(){
-        sky.setAttribute('src','./images/vr_images/9.jpg');
-
-        bottom_arrow.setAttribute('position','8 1 2')
-        bottom_arrow.setAttribute('rotation','0 -90 -90')
-
-        bottom_location = 'scene9'
-
-        eye1_location='';
-        eye2_location='';
-        eye1_value = eye2_value = 0;
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        nav_icon_updater();
-      },
-
-      scene11: function(){
-        sky.setAttribute('src','./images/vr_images/13.png');
-
-        top_arrow.setAttribute('position','4 1 -0.5')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-7 2 0.7')
-        bottom_arrow.setAttribute('rotation','0 90 90')
-
-        bottom_location='scene9'
-        top_location ='scene12'
-
-        eye1_location='';
-        eye2_location='';
-    
-        eye1_value = eye2_value= 0;
- 
-        top_arrow_value = bottom_arrow_value= 1;
-        
-        nav_icon_updater();
-      },
-
-      scene12: function(){
-        sky.setAttribute('src','./images/vr_images/10.png');
-
-        top_arrow.setAttribute('position','5 1 -0.5')
-        top_arrow.setAttribute('rotation','-90 0 0')
-        bottom_arrow.setAttribute('position','-5 1 -0.5')
-        bottom_arrow.setAttribute('rotation','-90 180 0')
-        
-        eye1.setAttribute('position','-1 3.5 -5')
-        eye1.setAttribute('rotation','0 0 0')
-
-        bottom_location='scene11'
-        top_location ='scene14'
-
-        eye1_location='scene13';
-        eye2_location='';
-        
-        eye1_value = 1;
-        eye2_value= 0;
- 
-        top_arrow_value = bottom_arrow_value= 1;
-        exit_arrow.setAttribute('position','6 100 0')
-        exit_arrow.setAttribute('visible','false')
-        
-        nav_icon_updater();
-      },
-
-      scene13: function(){
-        sky.setAttribute('src','./images/vr_images/11.jpg');
-
-        top_arrow.setAttribute('position','8 3 -0.5')
-        top_arrow.setAttribute('rotation','0 -90 90')
-        
-
-        bottom_location=''
-        top_location ='scene12'
-
-        eye1_location='';
-        eye2_location='';
-        
-        eye1_value = eye2_value= 0;
- 
-        top_arrow_value = 1;
-        bottom_arrow_value= 0;
-        
-        nav_icon_updater();
-      },
-
-      scene14: function(){
-        sky.setAttribute('src','./images/vr_images/12.png');
-
-        bottom_arrow.setAttribute('position','-8 3 1')
-        bottom_arrow.setAttribute('rotation','0 90 90')
-        
-        eye1.setAttribute('position','-1 3.5 -5')
-        eye1.setAttribute('rotation','0 0 0')
-
-        bottom_location='scene12'
-        top_location =''
-
-        eye1_location='';
-        eye2_location='';
-        
-        eye1_value = 0;
-        eye2_value= 0;
- 
-        top_arrow_value = 0;
-        bottom_arrow_value= 1;
-        
-        exit_arrow.setAttribute('position','6 2 0')
-        exit_arrow.setAttribute('visible','true')
-        nav_icon_updater();
-      }
-
-
+      scene1: function() { sky.setAttribute('src','./images/vr_images/1.png'); top_arrow.setAttribute('position','5 0 0.5'); top_arrow.setAttribute('rotation','-90 0 0'); bottom_arrow.setAttribute('rotation','-90 180 0'); eye1_location=''; eye2_location=''; eye1_value = eye2_value = 0; top_arrow_value = 1; bottom_arrow_value = 0; top_location='scene2'; bottom_location=''; nav_icon_updater(); },
+      scene2: function(){ sky.setAttribute('src','./images/vr_images/2.png'); top_arrow.setAttribute('position','6 0 -2'); top_arrow.setAttribute('rotation','-90 0 0'); bottom_arrow.setAttribute('position','-7 -1 0'); bottom_arrow.setAttribute('rotation','-90 180 0'); eye1.setAttribute('position','8 6 -10'); eye2.setAttribute('position','10 6 7'); eye1.setAttribute('rotation','0 -50 0'); eye2.setAttribute('rotation','0 -120 0'); top_location ='scene3'; bottom_location='scene1'; eye1_location='scene4'; eye2_location='scene5'; eye1_value = eye2_value = 1; top_arrow_value = 1; bottom_arrow_value= 1; nav_icon_updater(); },
+      scene3: function(){ sky.setAttribute('src','./images/vr_images/3.png'); top_arrow.setAttribute('position','6 0 0'); top_arrow.setAttribute('rotation','-90 0 0'); bottom_arrow.setAttribute('position','-5 -2 -0.5'); bottom_arrow.setAttribute('rotation','-90 180 0'); eye1.setAttribute('position','5 5 -9'); eye2.setAttribute('position','5 5 9'); eye1.setAttribute('rotation','0 -50 0'); eye2.setAttribute('rotation','0 -150 0'); bottom_location='scene2'; top_location ='scene6'; eye1_location='scene4'; eye2_location='scene5'; eye1_value = eye2_value = 1; top_arrow_value = 1; bottom_arrow_value= 1; nav_icon_updater(); },
+      scene4: function(){ sky.setAttribute('src','./images/vr_images/4.png'); bottom_arrow.setAttribute('position','-5 1 -2'); bottom_arrow.setAttribute('rotation','0 70 -90'); bottom_location = 'scene3'; eye1_location=''; eye2_location=''; eye1_value = eye2_value = 0; top_arrow_value = 0; bottom_arrow_value= 1; nav_icon_updater(); },
+      scene5: function(){ sky.setAttribute('src','./images/vr_images/5.jpg'); bottom_arrow.setAttribute('position','4 1 0'); bottom_arrow.setAttribute('rotation','0 -90 -90'); bottom_location = 'scene3'; eye1_location=''; eye2_location=''; eye1_value = eye2_value = 0; top_arrow_value = 0; bottom_arrow_value= 1; nav_icon_updater(); },
+      scene6: function(){ sky.setAttribute('src','./images/vr_images/6.png'); top_arrow.setAttribute('position','6 0 -1'); top_arrow.setAttribute('rotation','-90 0 0'); bottom_arrow.setAttribute('position','-6 0 -1'); bottom_arrow.setAttribute('rotation','-90 180 0'); eye1.setAttribute('position','0 3.5 -7'); eye2.setAttribute('position','0 3.5 7'); eye1.setAttribute('rotation','0 0 0'); eye2.setAttribute('rotation','0 -180 0'); bottom_location='scene3'; top_location ='scene9'; eye1_location='scene7'; eye2_location='scene8'; eye1_value = eye2_value = 1; top_arrow_value = 1; bottom_arrow_value= 1; nav_icon_updater(); },
+      scene7: function(){ sky.setAttribute('src','./images/vr_images/7.jpg'); bottom_arrow.setAttribute('position','-4 2 -0.3'); bottom_arrow.setAttribute('rotation','0 90 90'); bottom_location = 'scene6'; eye1_location=''; eye2_location=''; eye1_value = eye2_value = 0; top_arrow_value = 0; bottom_arrow_value= 1; nav_icon_updater(); },
+      scene8: function(){ sky.setAttribute('src','./images/vr_images/real_8.png'); bottom_arrow.setAttribute('position','-4 2 8'); bottom_arrow.setAttribute('rotation','0 150 90'); bottom_location = 'scene6'; eye1_location=''; eye2_location=''; eye1_value = eye2_value = 0; top_arrow_value = 0; bottom_arrow_value= 1; nav_icon_updater(); },
+      scene9: function(){ sky.setAttribute('src','./images/vr_images/8.png'); top_arrow.setAttribute('position','8 2 -0.5'); top_arrow.setAttribute('rotation','0 -90 90'); bottom_arrow.setAttribute('position','-7 0 -0.5'); bottom_arrow.setAttribute('rotation','-90 180 0'); eye1.setAttribute('position','-4 3.5 -5'); eye1.setAttribute('rotation','0 45 0'); bottom_location='scene6'; top_location ='scene11'; eye1_location='scene10'; eye2_location=''; eye2_value = 0; eye1_value = 1; top_arrow_value = 1; bottom_arrow_value= 1; nav_icon_updater(); },
+      scene10: function(){ sky.setAttribute('src','./images/vr_images/9.jpg'); bottom_arrow.setAttribute('position','8 1 2'); bottom_arrow.setAttribute('rotation','0 -90 -90'); bottom_location = 'scene9'; eye1_location=''; eye2_location=''; eye1_value = eye2_value = 0; top_arrow_value = 0; bottom_arrow_value= 1; nav_icon_updater(); },
+      scene11: function(){ sky.setAttribute('src','./images/vr_images/13.png'); top_arrow.setAttribute('position','4 1 -0.5'); top_arrow.setAttribute('rotation','-90 0 0'); bottom_arrow.setAttribute('position','-7 2 0.7'); bottom_arrow.setAttribute('rotation','0 90 90'); bottom_location='scene9'; top_location ='scene12'; eye1_location=''; eye2_location=''; eye1_value = eye2_value= 0; top_arrow_value = bottom_arrow_value= 1; nav_icon_updater(); },
+      scene12: function(){ sky.setAttribute('src','./images/vr_images/10.png'); top_arrow.setAttribute('position','5 1 -0.5'); top_arrow.setAttribute('rotation','-90 0 0'); bottom_arrow.setAttribute('position','-5 1 -0.5'); bottom_arrow.setAttribute('rotation','-90 180 0'); eye1.setAttribute('position','-1 3.5 -5'); eye1.setAttribute('rotation','0 0 0'); bottom_location='scene11'; top_location ='scene14'; eye1_location='scene13'; eye2_location=''; eye1_value = 1; eye2_value= 0; top_arrow_value = bottom_arrow_value= 1; exit_arrow.setAttribute('position','6 100 0'); exit_arrow.setAttribute('visible','false'); nav_icon_updater(); },
+      scene13: function(){ sky.setAttribute('src','./images/vr_images/11.jpg'); top_arrow.setAttribute('position','8 3 -0.5'); top_arrow.setAttribute('rotation','0 -90 90'); bottom_location=''; top_location ='scene12'; eye1_location=''; eye2_location=''; eye1_value = eye2_value= 0; top_arrow_value = 1; bottom_arrow_value= 0; nav_icon_updater(); },
+      scene14: function(){ sky.setAttribute('src','./images/vr_images/12.png'); bottom_arrow.setAttribute('position','-8 3 1'); bottom_arrow.setAttribute('rotation','0 90 90'); eye1.setAttribute('position','-1 3.5 -5'); eye1.setAttribute('rotation','0 0 0'); bottom_location='scene12'; top_location =''; eye1_location=''; eye2_location=''; eye1_value = 0; eye2_value= 0; top_arrow_value = 0; bottom_arrow_value= 1; exit_arrow.setAttribute('position','6 2 0'); exit_arrow.setAttribute('visible','true'); nav_icon_updater(); }
     }
 
-    function nav_icon_updater(){
-      top_arrow.setAttribute('visible',top_arrow_value !== 0)
-      bottom_arrow.setAttribute('visible',bottom_arrow_value !== 0)
-      eye1.setAttribute('visible',eye1_value !== 0)
-      eye2.setAttribute('visible',eye2_value !== 0)
-    }
-
-    function handleDirectionClick(location) {
-      if (location && functions[location]) {
-        functions[location]();
-      }
-    }
-
-    exit_arrow.addEventListener('click',()=>{
-      exitModal.style.display = 'flex';
-    })
-
-    /*Default Scene*/
+    function nav_icon_updater(){ top_arrow.setAttribute('visible',top_arrow_value !== 0); bottom_arrow.setAttribute('visible',bottom_arrow_value !== 0); eye1.setAttribute('visible',eye1_value !== 0); eye2.setAttribute('visible',eye2_value !== 0); }
+    function handleDirectionClick(location) { if (location && functions[location]) functions[location](); }
+    exit_arrow.addEventListener('click',()=>{ exitModal.style.display = 'flex'; });
     functions.scene1();
   </script>
 
-<script>
-  const sceneData = [
-    { id:'scene1',  file:'1.png',      loc:'Location Name A',    sub:'Short description here' },
-    { id:'scene2',  file:'2.png',      loc:'Location Name B',    sub:'Short description here' },
-    { id:'scene3',  file:'3.png',      loc:'Location Name C',    sub:'Short description here' },
-    { id:'scene4',  file:'4.png',      loc:'Location Name D',    sub:'Short description here' },
-    { id:'scene5',  file:'5.jpg',      loc:'Location Name E',    sub:'Short description here' },
-    { id:'scene6',  file:'6.png',      loc:'Location Name F',    sub:'Short description here' },
-    { id:'scene7',  file:'7.jpg',      loc:'Location Name G',    sub:'Short description here' },
-    { id:'scene8',  file:'real_8.png', loc:'Location Name H',    sub:'Short description here' },
-    { id:'scene9',  file:'8.png',      loc:'Location Name I',    sub:'Short description here' },
-    { id:'scene10', file:'9.jpg',      loc:'Location Name J',    sub:'Short description here' },
-    { id:'scene11', file:'13.png',     loc:'Location Name K',    sub:'Short description here' },
-    { id:'scene12', file:'10.png',     loc:'Location Name L',    sub:'Short description here' },
-    { id:'scene13', file:'11.jpg',     loc:'Location Name M',    sub:'Short description here' },
-    { id:'scene14', file:'12.png',     loc:'Location Name N',    sub:'Short description here' },
-  ];
-
-  let currentSceneId = 'scene1';
-  const roomLabel = document.getElementById('roomLabel');
-  const compassNeedle = document.getElementById('compassNeedle');
-
-  function updateRoomLabel(sceneId) {
-    const scene = sceneData.find(s => s.id === sceneId);
-    if (scene) roomLabel.textContent = scene.loc;
-  }
-
-  function updateCompass() {
-    const camera = document.querySelector('a-camera');
-    if (!camera) return;
-    const rot = camera.getAttribute('rotation');
-    if (rot) {
-      compassNeedle.style.transform = `rotate(${rot.y}deg)`;
-    }
-  }
-
-  setInterval(updateCompass, 100);
-
-  function buildSceneGrid() {
-    const grid = document.getElementById('sceneGrid');
-    grid.innerHTML = '';
-    sceneData.forEach(s => {
-      const card = document.createElement('div');
-      card.className = 'sv-card';
-      card.innerHTML = `
-        <div class="sv-thumb">
-          <img src="./images/vr_images/${s.file}" alt="${s.loc}">
-          <div class="sv-num">${s.id.replace('scene','#')}</div>
-          ${s.id === currentSceneId ? '<div class="sv-here">You are here</div>' : ''}
-        </div>
-        <div class="sv-body">
-          <div class="sv-name">${s.loc}</div>
-          <div class="sv-sub">${s.sub}</div>
-        </div>
-      `;
-      card.addEventListener('click', () => {
-        handleDirectionClick(s.id);
-        currentSceneId = s.id;
-        closeMap();
-      });
-      grid.appendChild(card);
-    });
-  }
-
-  function openMap() { buildSceneGrid(); document.getElementById('mapOverlay').style.display = 'flex'; }
-  function closeMap() { document.getElementById('mapOverlay').style.display = 'none'; }
-
-  document.getElementById('mapBtn').addEventListener('click', openMap);
-  document.getElementById('closeMap').addEventListener('click', closeMap);
-  document.getElementById('mapOverlay').addEventListener('click', e => {
-    if (e.target === document.getElementById('mapOverlay')) closeMap();
-  });
-
-  const _orig = handleDirectionClick;
-  window.handleDirectionClick = function(loc) {
-    if (loc) {
-      currentSceneId = loc;
-      updateRoomLabel(loc);
-    }
-    _orig(loc);
-  };
-
-  // Init label on load
-  updateRoomLabel('scene1');
-</script>
-
- <!-- Scroll Smoother -->
   <script>
-  AFRAME.registerComponent('smooth-mouse-look', {
-    schema: {
-      sensitivity: { default: 0.002 },
-      damping: { default: 0.92 }
-    },
+    const sceneData = [{ id:'scene1',file:'1.png',loc:'Location Name A',sub:'Short description'},{ id:'scene2',file:'2.png',loc:'Location Name B',sub:'Short description'},{ id:'scene3',file:'3.png',loc:'Location Name C',sub:'Short description'},{ id:'scene4',file:'4.png',loc:'Location Name D',sub:'Short description'},{ id:'scene5',file:'5.jpg',loc:'Location Name E',sub:'Short description'},{ id:'scene6',file:'6.png',loc:'Location Name F',sub:'Short description'},{ id:'scene7',file:'7.jpg',loc:'Location Name G',sub:'Short description'},{ id:'scene8',file:'real_8.png',loc:'Location Name H',sub:'Short description'},{ id:'scene9',file:'8.png',loc:'Location Name I',sub:'Short description'},{ id:'scene10',file:'9.jpg',loc:'Location Name J',sub:'Short description'},{ id:'scene11',file:'13.png',loc:'Location Name K',sub:'Short description'},{ id:'scene12',file:'10.png',loc:'Location Name L',sub:'Short description'},{ id:'scene13',file:'11.jpg',loc:'Location Name M',sub:'Short description'},{ id:'scene14',file:'12.png',loc:'Location Name N',sub:'Short description'}];
+    let currentSceneId = 'scene1';
+    const roomLabel = document.getElementById('roomLabel');
+    const compassNeedle = document.getElementById('compassNeedle');
+    function updateRoomLabel(sceneId) { const scene = sceneData.find(s => s.id === sceneId); if (scene) roomLabel.textContent = scene.loc; }
+    function updateCompass() { const camera = document.querySelector('a-camera'); if (!camera) return; const rot = camera.getAttribute('rotation'); if (rot) compassNeedle.style.transform = `rotate(${rot.y}deg)`; }
+    setInterval(updateCompass, 100);
+    function buildSceneGrid() { const grid = document.getElementById('sceneGrid'); grid.innerHTML = ''; sceneData.forEach(s => { const card = document.createElement('div'); card.className = 'sv-card'; card.innerHTML = `<div class="sv-thumb"><img src="./images/vr_images/${s.file}" alt="${s.loc}"><div class="sv-num">${s.id.replace('scene','#')}</div>${s.id === currentSceneId ? '<div class="sv-here">You are here</div>' : ''}</div><div class="sv-body"><div class="sv-name">${s.loc}</div><div class="sv-sub">${s.sub}</div></div>`; card.addEventListener('click', () => { handleDirectionClick(s.id); currentSceneId = s.id; closeMap(); }); grid.appendChild(card); }); }
+    function openMap() { buildSceneGrid(); document.getElementById('mapOverlay').style.display = 'flex'; }
+    function closeMap() { document.getElementById('mapOverlay').style.display = 'none'; }
+    document.getElementById('mapBtn').addEventListener('click', openMap);
+    document.getElementById('closeMap').addEventListener('click', closeMap);
+    document.getElementById('mapOverlay').addEventListener('click', e => { if (e.target === document.getElementById('mapOverlay')) closeMap(); });
+    const _orig = handleDirectionClick;
+    window.handleDirectionClick = function(loc) { if (loc) { currentSceneId = loc; updateRoomLabel(loc); } _orig(loc); };
+    updateRoomLabel('scene1');
+  </script>
 
-    init() {
-      this.yaw = 0;
-      this.pitch = 0;
-      this.vYaw = 0;
-      this.vPitch = 0;
-      this.dragging = false;
-
-      this.onMouseDown = () => this.dragging = true;
-      this.onMouseUp = () => this.dragging = false;
-
-      this.onMouseMove = (e) => {
-        if (!this.dragging) return;
-        this.vYaw -= e.movementX * this.data.sensitivity;
-        this.vPitch -= e.movementY * this.data.sensitivity;
-      };
-
-      window.addEventListener('mousedown', this.onMouseDown);
-      window.addEventListener('mouseup', this.onMouseUp);
-      window.addEventListener('mousemove', this.onMouseMove);
-    },
-
-    tick() {
-      this.yaw += this.vYaw;
-      this.pitch += this.vPitch;
-
-      this.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pitch));
-
-      this.el.object3D.rotation.set(this.pitch, this.yaw, 0);
-
-      this.vYaw *= this.data.damping;
-      this.vPitch *= this.data.damping;
-    },
-
-    remove() {
-      window.removeEventListener('mousedown', this.onMouseDown);
-      window.removeEventListener('mouseup', this.onMouseUp);
-      window.removeEventListener('mousemove', this.onMouseMove);
-    }
-  });
-</script>
-
-<script>
-  // Zoom
-  const cam = document.querySelector('a-camera');
-  let currentFov = 90;
-
-  document.getElementById('zoomIn').addEventListener('click', () => {
-    currentFov = Math.max(30, currentFov - 10);
-    cam.setAttribute('fov', currentFov);
-  });
-
-  document.getElementById('zoomOut').addEventListener('click', () => {
-    currentFov = Math.min(120, currentFov + 10);
-    cam.setAttribute('fov', currentFov);
-  });
-
-  // Leave modal
+  <script>
+  AFRAME.registerComponent('smooth-mouse-look', { schema: { sensitivity: { default: 0.002 }, damping: { default: 0.92 } }, init() { this.yaw = 0; this.pitch = 0; this.vYaw = 0; this.vPitch = 0; this.dragging = false; this.onMouseDown = () => this.dragging = true; this.onMouseUp = () => this.dragging = false; this.onMouseMove = (e) => { if (!this.dragging) return; this.vYaw -= e.movementX * this.data.sensitivity; this.vPitch -= e.movementY * this.data.sensitivity; }; window.addEventListener('mousedown', this.onMouseDown); window.addEventListener('mouseup', this.onMouseUp); window.addEventListener('mousemove', this.onMouseMove); }, tick() { this.yaw += this.vYaw; this.pitch += this.vPitch; this.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pitch)); this.el.object3D.rotation.set(this.pitch, this.yaw, 0); this.vYaw *= this.data.damping; this.vPitch *= this.data.damping; }, remove() { window.removeEventListener('mousedown', this.onMouseDown); window.removeEventListener('mouseup', this.onMouseUp); window.removeEventListener('mousemove', this.onMouseMove); } });
+  const cam = document.querySelector('a-camera'); let currentFov = 90;
+  document.getElementById('zoomIn').addEventListener('click', () => { currentFov = Math.max(30, currentFov - 10); cam.setAttribute('fov', currentFov); });
+  document.getElementById('zoomOut').addEventListener('click', () => { currentFov = Math.min(120, currentFov + 10); cam.setAttribute('fov', currentFov); });
   const exitModal = document.getElementById('exitModal');
-
-  document.getElementById('leaveBtn').addEventListener('click', () => {
-    exitModal.style.display = 'flex';
-  });
-
-  document.getElementById('cancelExit').addEventListener('click', () => {
-    exitModal.style.display = 'none';
-  });
-
-  document.getElementById('confirmExit').addEventListener('click', () => {
-    window.close();
-    // fallback if window.close() is blocked
-    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0a0a;color:rgba(255,255,255,0.4);font-family:Inter,sans-serif;font-size:14px;">You may now close this tab.</div>';
-  });
-
-  // Click outside modal to dismiss
-  exitModal.addEventListener('click', (e) => {
-    if (e.target === exitModal) exitModal.style.display = 'none';
-  });
-</script>
-
-<script>
-  const sceneInfo = {
-    scene1:  { title: 'About the scene A', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Proin at sapien vel felis tempor dignissim.' },
-    scene2:  { title: 'About the scene B', text: 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec euismod, nisl vel justo fermentum, at volutpat nisi gravida. Curabitur sit amet nunc vel libero cursus tincidunt.' },
-    scene3:  { title: 'About the scene C', text: 'Quisque vehicula diam at felis tincidunt, nec fermentum eros dignissim. Fusce euismod, nisl vel justo fermentum, at volutpat nisi gravida. Integer bibendum orci at diam pretium, vel fermentum metus vulputate.' },
-    scene4:  { title: 'About the scene D', text: 'Curabitur euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Morbi fringilla orci nec metus hendrerit, vel dignissim eros commodo.' },
-    scene5:  { title: 'About the scene E', text: 'Aliquam erat volutpat. Nullam euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Vivamus fringilla sapien nec lectus dignissim porttitor.' },
-    scene6:  { title: 'About the scene F', text: 'Etiam euismod nisl vel justo fermentum, at volutpat nisi gravida. Donec tincidunt erat ac metus pretium, nec facilisis enim posuere. Phasellus at sapien vel felis tempor dignissim nec vel lorem.' },
-    scene7:  { title: 'About the scene G', text: 'Suspendisse euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere.' },
-    scene8:  { title: 'About the scene H', text: 'Maecenas euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Nulla facilisi. Proin fringilla orci nec metus hendrerit vel dignissim.' },
-    scene9:  { title: 'About the scene I', text: 'Praesent euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Aenean fringilla orci nec metus hendrerit, vel dignissim eros commodo.' },
-    scene10: { title: 'About the scene J', text: 'Fusce euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Duis fringilla orci nec metus hendrerit, vel dignissim eros posuere.' },
-    scene11: { title: 'About the scene K', text: 'Integer euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Nam fringilla orci nec metus hendrerit, vel dignissim eros ultrices.' },
-    scene12: { title: 'About the scene L', text: 'Vivamus euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Cras fringilla orci nec metus hendrerit vel dignissim eros commodo.' },
-    scene13: { title: 'About the scene M', text: 'Nunc euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Morbi fringilla orci nec metus hendrerit, vel dignissim eros luctus.' },
-    scene14: { title: 'About the scene N', text: 'Duis euismod nisl vel justo fermentum, at volutpat nisi gravida. Sed tincidunt erat ac metus pretium, nec facilisis enim posuere. Nullam fringilla orci nec metus hendrerit, vel dignissim eros ultrices posuere.' },
-  };
-
-  const infoOverlay = document.getElementById('infoOverlay');
-  const infoTitle   = document.getElementById('infoTitle');
-  const infoText    = document.getElementById('infoText');
-
-  function openInfo() {
-    const data = sceneInfo[currentSceneId];
-    if (!data) return;
-    infoTitle.textContent = data.title;
-    infoText.textContent  = data.text;
-    infoOverlay.style.display = 'flex';
-  }
-
-  function closeInfo() {
-    infoOverlay.style.display = 'none';
-  }
-
-  document.getElementById('infoBtn').addEventListener('click', openInfo);
-  document.getElementById('closeInfo').addEventListener('click', closeInfo);
-  infoOverlay.addEventListener('click', e => {
-    if (e.target === infoOverlay) closeInfo();
-  });
-</script>
-
-<script>
-  const TOTAL_SCENES = 14;
-  const fadeOverlay  = document.getElementById('fadeOverlay');
-  const progressFill = document.getElementById('progressFill');
-  const progressText = document.getElementById('progressText');
-  const shareToast   = document.getElementById('shareToast');
-
-  // Scene order for progress tracking
-  const sceneOrder = ['scene1','scene2','scene3','scene4','scene5','scene6','scene7',
-                      'scene8','scene9','scene10','scene11','scene12','scene13','scene14'];
-
+  document.getElementById('leaveBtn').addEventListener('click', () => { exitModal.style.display = 'flex'; });
+  document.getElementById('cancelExit').addEventListener('click', () => { exitModal.style.display = 'none'; });
+  document.getElementById('confirmExit').addEventListener('click', () => { window.close(); document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0a0a;color:rgba(255,255,255,0.4);font-family:Inter,sans-serif;font-size:14px;">You may now close this tab.</div>'; });
+  exitModal.addEventListener('click', (e) => { if (e.target === exitModal) exitModal.style.display = 'none'; });
+  const sceneInfo = { scene1: { title: 'About scene A', text: 'Historical insight about this location.' }, scene2: { title: 'About scene B', text: 'Architectural details from the era.' }, scene3: { title: 'About scene C', text: 'Cultural significance of the space.' }, scene4: { title: 'About scene D', text: 'Artifacts and heritage.' }, scene5: { title: 'About scene E', text: 'Stories from the past.' }, scene6: { title: 'About scene F', text: 'Restoration notes.' }, scene7: { title: 'About scene G', text: 'Local traditions.' }, scene8: { title: 'About scene H', text: 'Family history.' }, scene9: { title: 'About scene I', text: 'Architectural marvel.' }, scene10: { title: 'About scene J', text: 'Preserved elements.' }, scene11: { title: 'About scene K', text: 'Original features.' }, scene12: { title: 'About scene L', text: 'Heritage value.' }, scene13: { title: 'About scene M', text: 'Notable events.' }, scene14: { title: 'About scene N', text: 'Legacy of Saratha Vilas.' } };
+  const infoOverlay = document.getElementById('infoOverlay'); const infoTitle = document.getElementById('infoTitle'); const infoText = document.getElementById('infoText');
+  function openInfo() { const data = sceneInfo[currentSceneId]; if (!data) return; infoTitle.textContent = data.title; infoText.textContent = data.text; infoOverlay.style.display = 'flex'; }
+  function closeInfo() { infoOverlay.style.display = 'none'; }
+  document.getElementById('infoBtn').addEventListener('click', openInfo); document.getElementById('closeInfo').addEventListener('click', closeInfo); infoOverlay.addEventListener('click', e => { if (e.target === infoOverlay) closeInfo(); });
+  const TOTAL_SCENES = 14; const fadeOverlay = document.getElementById('fadeOverlay'); const progressFill = document.getElementById('progressFill'); const progressText = document.getElementById('progressText'); const shareToast = document.getElementById('shareToast');
+  const sceneOrder = ['scene1','scene2','scene3','scene4','scene5','scene6','scene7','scene8','scene9','scene10','scene11','scene12','scene13','scene14'];
   function getSceneIndex(id) { return sceneOrder.indexOf(id); }
-
-  function updateProgress(sceneId) {
-    const idx   = getSceneIndex(sceneId);
-    const num   = idx + 1;
-    const pct   = Math.round((num / TOTAL_SCENES) * 100);
-    progressFill.style.width = pct + '%';
-    progressText.textContent = num + ' of ' + TOTAL_SCENES;
-  }
-
-  // Fade transition — wrap handleDirectionClick
+  function updateProgress(sceneId) { const idx = getSceneIndex(sceneId); const num = idx + 1; const pct = Math.round((num / TOTAL_SCENES) * 100); progressFill.style.width = pct + '%'; progressText.textContent = num + ' of ' + TOTAL_SCENES; }
   const _origFade = window.handleDirectionClick;
-  window.handleDirectionClick = function(loc) {
-    if (!loc) return;
-    fadeOverlay.style.pointerEvents = 'all';
-    fadeOverlay.style.opacity = '1';
-    setTimeout(() => {
-      _origFade(loc);
-      updateProgress(loc);
-      setTimeout(() => {
-        fadeOverlay.style.opacity = '0';
-        fadeOverlay.style.pointerEvents = 'none';
-      }, 80);
-    }, 250);
-  };
-
-  // Deep link: load scene from URL on startup
-  (function() {
-    const params = new URLSearchParams(window.location.search);
-    const s = params.get('scene');
-    if (s && sceneOrder.includes(s)) {
-      window.handleDirectionClick(s);
-    } else {
-      updateProgress('scene1');
-    }
-  })();
-
-  // Share button
-  document.getElementById('shareBtn').addEventListener('click', () => {
-    const url = location.origin + location.pathname + '?scene=' + currentSceneId;
-    navigator.clipboard.writeText(url).then(() => {
-      shareToast.style.opacity = '1';
-      setTimeout(() => shareToast.style.opacity = '0', 2200);
-    });
-  });
-
-  // Fullscreen toggle
-  const fsBtn  = document.getElementById('fullscreenBtn');
-  const fsIcon = document.getElementById('fsIcon');
-
-  const expandIcon = `<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>`;
-  const collapseIcon = `<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/>`;
-
-  fsBtn.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  });
-
-  document.addEventListener('fullscreenchange', () => {
-    fsIcon.innerHTML = document.fullscreenElement ? collapseIcon : expandIcon;
-  });
-
-  // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    // Don't fire if an overlay is open
-    if (document.getElementById('mapOverlay').style.display === 'flex') return;
-    if (document.getElementById('infoOverlay').style.display === 'flex') return;
-    if (document.getElementById('exitModal').style.display === 'flex') return;
-
-    if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
-      if (top_location) window.handleDirectionClick(top_location);
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
-      if (bottom_location) window.handleDirectionClick(bottom_location);
-    } else if (e.key === 'Escape') {
-      exitModal.style.display = 'flex';
-    } else if (e.key === 'm' || e.key === 'M') {
-      openMap();
-    } else if (e.key === 'i' || e.key === 'I') {
-      openInfo();
-    }
-  });
-</script>
-
-<script>
-  // ── Dot Trail ──────────────────────────────────────────
-  const dotTrail = document.getElementById('dotTrail');
-  for (let i = 0; i < 14; i++) {
-    const dot = document.createElement('span');
-    if (i === 0) dot.classList.add('active');
-    dotTrail.appendChild(dot);
-  }
-
-  function updateDots(sceneId) {
-    const idx = sceneOrder.indexOf(sceneId);
-    dotTrail.querySelectorAll('span').forEach((d, i) => {
-      d.classList.toggle('active', i === idx);
-    });
-  }
-
-  // Hook into handleDirectionClick to update dots + timer
+  window.handleDirectionClick = function(loc) { if (!loc) return; fadeOverlay.style.pointerEvents = 'all'; fadeOverlay.style.opacity = '1'; setTimeout(() => { _origFade(loc); updateProgress(loc); setTimeout(() => { fadeOverlay.style.opacity = '0'; fadeOverlay.style.pointerEvents = 'none'; }, 80); }, 250); };
+  (function() { const params = new URLSearchParams(window.location.search); const s = params.get('scene'); if (s && sceneOrder.includes(s)) { window.handleDirectionClick(s); } else { updateProgress('scene1'); } })();
+  document.getElementById('shareBtn').addEventListener('click', () => { const url = location.origin + location.pathname + '?scene=' + currentSceneId; navigator.clipboard.writeText(url).then(() => { shareToast.style.opacity = '1'; setTimeout(() => shareToast.style.opacity = '0', 2200); }); });
+  const fsBtn = document.getElementById('fullscreenBtn'); const fsIcon = document.getElementById('fsIcon'); const expandIcon = `<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>`; const collapseIcon = `<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/>`;
+  fsBtn.addEventListener('click', () => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { document.exitFullscreen(); } });
+  document.addEventListener('fullscreenchange', () => { fsIcon.innerHTML = document.fullscreenElement ? collapseIcon : expandIcon; });
+  document.addEventListener('keydown', (e) => { if (document.getElementById('mapOverlay').style.display === 'flex') return; if (document.getElementById('infoOverlay').style.display === 'flex') return; if (document.getElementById('exitModal').style.display === 'flex') return; if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { if (top_location) window.handleDirectionClick(top_location); } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { if (bottom_location) window.handleDirectionClick(bottom_location); } else if (e.key === 'Escape') { exitModal.style.display = 'flex'; } else if (e.key === 'm' || e.key === 'M') { openMap(); } else if (e.key === 'i' || e.key === 'I') { openInfo(); } else if (e.key === 'f' || e.key === 'F') { fsBtn.click(); } });
+  const dotTrail = document.getElementById('dotTrail'); for (let i = 0; i < 14; i++) { const dot = document.createElement('span'); if (i === 0) dot.classList.add('active'); dotTrail.appendChild(dot); }
+  function updateDots(sceneId) { const idx = sceneOrder.indexOf(sceneId); dotTrail.querySelectorAll('span').forEach((d, i) => { d.classList.toggle('active', i === idx); }); }
   const _origDots = window.handleDirectionClick;
-  window.handleDirectionClick = function(loc) {
-    if (loc) {
-      updateDots(loc);
-      updateBackBtn(loc);
-    }
-    _origDots(loc);
-  };
-
-  // ── History Back Button ────────────────────────────────
-  const sceneHistory = [];
-  const backBtn = document.getElementById('backBtn');
-
-  function updateBackBtn(loc) {
-    if (loc) sceneHistory.push(loc);
-    if (sceneHistory.length > 1) {
-      backBtn.style.opacity = '1';
-      backBtn.style.pointerEvents = 'auto';
-    } else {
-      backBtn.style.opacity = '0';
-      backBtn.style.pointerEvents = 'none';
-    }
-  }
-
-  backBtn.addEventListener('click', () => {
-    if (sceneHistory.length < 2) return;
-    sceneHistory.pop(); // remove current
-    const prev = sceneHistory.pop(); // get previous (pop so push in handleDirectionClick re-adds it)
-    window.handleDirectionClick(prev);
-  });
-
-  // ── Welcome Splash ─────────────────────────────────────
-  const splash = document.getElementById('splash');
-  document.getElementById('beginBtn').addEventListener('click', () => {
-    splash.style.opacity = '0';
-    setTimeout(() => splash.style.display = 'none', 600);
-    document.documentElement.requestFullscreen();
-  });
-
-  // ── Auto-Rotate ────────────────────────────────────────
-let idleTimeout = null;
-let autoRotating = false;
-let autoRotateRaf = null;
-
-function startAutoRotate() {
-  if (autoRotating) return;
-  autoRotating = true;
-  const camEl = document.querySelector('a-camera');
-  const comp = camEl && camEl.components['smooth-mouse-look'];
-  function rotate() {
-    if (!autoRotating) return;
-    if (comp) {
-      comp.yaw += 0.002;
-    }
-    autoRotateRaf = requestAnimationFrame(rotate);
-  }
-  rotate();
-}
-
-function stopAutoRotate() {
-  autoRotating = false;
-  cancelAnimationFrame(autoRotateRaf);
-}
-
-  function resetIdle() {
-    stopAutoRotate();
-    clearTimeout(idleTimeout);
-    showHUD();
-    idleTimeout = setTimeout(() => {
-      hideHUD();
-      startAutoRotate();
-    }, 5000);
-  }
-
-  ['mousemove','mousedown','keydown','touchstart','wheel'].forEach(ev => {
-    window.addEventListener(ev, resetIdle, { passive: true });
-  });
-
-  // ── Hide/Show HUD on Idle ──────────────────────────────
-  function hideHUD() {
-  document.querySelectorAll('.hud-element').forEach(el => {
-    if (el.id === 'roomLabel') return;
-    el.classList.add('hud-hidden');
-  });
-  }
-  function showHUD() {
-    document.querySelectorAll('.hud-element').forEach(el => el.classList.remove('hud-hidden'));
-  }
-    // Start idle timer after splash
-    resetIdle();
-
-
-  // ── Keyboard: F for fullscreen ─────────────────────────
-  // Add to existing keydown listener
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'f' || e.key === 'F') {
-      document.getElementById('fullscreenBtn').click();
-    }
-  });
-</script>
-
-<script>
-  const bgAudio = document.getElementById('bgAudio');
-  const audioBtn = document.getElementById('audioBtn');
-  const audioIcon = document.getElementById('audioIcon');
-
-  const soundOnIcon = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>`;
-  const soundOffIcon = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>`;
-
-  let audioEnabled = false;
-  bgAudio.volume = 0.4;
-
-  function setAudioState(enabled) {
-    audioEnabled = enabled;
-    if (enabled) {
-      bgAudio.play().catch(() => {});
-      audioIcon.innerHTML = soundOnIcon;
-      audioBtn.style.background = 'rgba(255,255,255,0.07)';
-    } else {
-      bgAudio.pause();
-      audioIcon.innerHTML = soundOffIcon;
-      audioBtn.style.background = 'rgba(255,255,255,0.04)';
-    }
-  }
-
-  // Splash audio preference buttons
-  document.getElementById('audioYes').addEventListener('click', () => {
-    setAudioState(true);
-    document.getElementById('beginBtn').click();
-  });
-
-  document.getElementById('audioNo').addEventListener('click', () => {
-    setAudioState(false);
-    document.getElementById('beginBtn').click();
-  });
-
-  // Bottom bar toggle
-  audioBtn.addEventListener('click', () => {
-    setAudioState(!audioEnabled);
-  });
-
-  // Init icon to muted state
-  audioIcon.innerHTML = soundOffIcon;
-</script>
+  window.handleDirectionClick = function(loc) { if (loc) { updateDots(loc); updateBackBtn(loc); } _origDots(loc); };
+  const sceneHistory = []; const backBtn = document.getElementById('backBtn');
+  function updateBackBtn(loc) { if (loc) sceneHistory.push(loc); if (sceneHistory.length > 1) { backBtn.style.opacity = '1'; backBtn.style.pointerEvents = 'auto'; } else { backBtn.style.opacity = '0'; backBtn.style.pointerEvents = 'none'; } }
+  backBtn.addEventListener('click', () => { if (sceneHistory.length < 2) return; sceneHistory.pop(); const prev = sceneHistory.pop(); window.handleDirectionClick(prev); });
+  let idleTimeout = null; let autoRotating = false; let autoRotateRaf = null;
+  function startAutoRotate() { if (autoRotating) return; autoRotating = true; const camEl = document.querySelector('a-camera'); const comp = camEl && camEl.components['smooth-mouse-look']; function rotate() { if (!autoRotating) return; if (comp) { comp.yaw += 0.002; } autoRotateRaf = requestAnimationFrame(rotate); } rotate(); }
+  function stopAutoRotate() { autoRotating = false; cancelAnimationFrame(autoRotateRaf); }
+  function resetIdle() { stopAutoRotate(); clearTimeout(idleTimeout); showHUD(); idleTimeout = setTimeout(() => { hideHUD(); startAutoRotate(); }, 5000); }
+  ['mousemove','mousedown','keydown','touchstart','wheel'].forEach(ev => { window.addEventListener(ev, resetIdle, { passive: true }); });
+  function hideHUD() { document.querySelectorAll('.hud-element').forEach(el => { if (el.id === 'roomLabel') return; el.classList.add('hud-hidden'); }); }
+  function showHUD() { document.querySelectorAll('.hud-element').forEach(el => el.classList.remove('hud-hidden')); }
+  </script>
 </body>
 </html>
